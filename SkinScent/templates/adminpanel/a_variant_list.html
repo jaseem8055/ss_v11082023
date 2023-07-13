@@ -1,0 +1,221 @@
+{% extends 'adminpanel/a_base1.html' %}
+
+{% block content %}
+  <h4>Product Management/Variants List</h4>
+
+  <table class="table table-striped">
+    <h6>Product:</h6>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Product Name</th>
+        <th>Category</th>
+        <th>Unit</th>
+        <th>Description</th>        
+      </tr>
+    </thead>
+    <tbody>      
+      <tr>
+        <td>{{ product.product_id }}</td>
+        <td>{{ product.name }}</td>
+        <td>{{ product.category }}</td>        
+        <td>{{ product.unit_of_measurement.unit }}</td>
+        <td>{{ product.description }}</td>        
+      </tr>      
+    </tbody>
+  </table>
+
+  <br>
+  <br>  
+
+  <table class="table table-striped">
+    <h6>Product Variants:</h6>
+    <thead>
+      <tr>
+        <th>Sr.</th>
+        <th>Varied by</th>
+        <th>Varient Value</th>
+        <th>Quantity</th>
+        <th>Price</th>        
+      </tr>
+    </thead>
+    <tbody> 
+      {% for variant in variants  %}
+      <tr>
+        <td>{{ variant.pk }}</td>
+        <td>{{ variant.varied_by }}</td>
+        <td>{{ variant.variant_value }}</td>        
+        <td>{{ variant.quantity }}</td>
+        <td>{{ variant.price }}</td>        
+      </tr>      
+      {% endfor %}     
+    </tbody>
+  </table>
+
+  <br>
+  <br>
+
+
+  <form id="addVariantForm" method="post" action="/adminpanel/add_variant/{{ product.pk }}/">
+    {% csrf_token %}
+  
+    <table class="table table-striped">
+      <h6>Add New Variants:</h6>
+      <thead>
+        <tr>        
+          <th>Varied by</th>
+          <th>Variant Value</th>
+          <th>Quantity</th>
+          <th>Price</th>        
+        </tr>
+      </thead>
+      <tbody> 
+        
+        <tr>
+          <td>
+            <select class="form-select" id="varied_by" name="varied_by" required>
+              <option value="" disabled selected>Select from list</option>
+              <option value="size">size</option>
+              <option value="color">color</option>          
+            </select>        
+          </td>
+          <td>
+            <input type="text" name="variant_value" id="variant_value" class="form-control" required>
+          </td>
+          <td>
+            <input type="text" name="quantity" id="quantity" class="form-control" required>
+          </td>
+          <td>
+            <input type="text" name="price" id="price" class="form-control" required>
+          </td>        
+        </tr>      
+        
+      </tbody>
+    </table>
+  
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <span>||</span>
+        <a href="/adminpanel/start_variant/">Go Back</a>
+      </div>
+    </div>
+  </form>
+  
+
+
+
+
+
+
+
+
+
+
+
+  {% comment %} <table class="table table-striped">
+    <h6>Add New Variants:</h6>
+    <thead>
+      <tr>        
+        <th>Varied by</th>
+        <th>Varient Value</th>
+        <th>Quantity</th>
+        <th>Price</th>        
+      </tr>
+    </thead>
+    <tbody> 
+      
+      <tr>
+        <td>
+          <select class="form-select" id="varied_by" name="varied_by" required>
+          <option value="" disabled selected>Select from list</option>
+          <option value="size">size</option>
+          <option value="color">color</option>          
+          </select>        
+        </td>
+        <td>
+          <input type="text" name="variant_value" id="variant_value" class="form-control" required>
+        </td>
+        <td>
+          <input type="text" name="quantity" id="quantity" class="form-control" required>
+        </td>
+        <td>
+          <input type="text" name="price" id="price" class="form-control" required>
+        </td>        
+      </tr>      
+      
+    </tbody>
+  </table>
+
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <button type="submit" class="btn btn-primary">Save</button>
+      <span>||</span>
+      <a href="/start_variant/">Go Back</a>
+    </div>
+  </div> {% endcomment %}
+
+  {% comment %} <form id="addVariant" method="post" class="mt-4" action="{% url 'adminpanel:add-cat' %}"> {% endcomment %}
+  {% comment %} <form id="addVariant" method="post" class="mt-4" action="">
+    {% csrf_token %}
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="category_name" class="form-label">Varied by:</label>
+        <select class="form-select" id="varied_by" name="varied_by" required>
+          <option value="" disabled selected>Select from list</option>
+          <option value="size">size</option>
+          <option value="color">color</option>          
+        </select>        
+      </div>
+      
+      <div class="col-md-6 mb-3">
+        <label for="variant_value" class="form-label">Variant Value:</label>
+        <input type="text" name="variant_value" id="variant_value" class="form-control" required>
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label for="quantity" class="form-label">Quantity:</label>
+        <input type="text" name="quantity" id="quantity" class="form-control" required>
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label for="quantity" class="form-label">Price:</label>
+        <input type="text" name="price" id="price" class="form-control" required>
+      </div>
+    </div>   
+   
+           
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <span>||</span>
+        <a href="/list_cat/">Cancel</a>
+      </div>
+    </div>
+  </form> {% endcomment %}
+  
+  <nav aria-label="Product pagination">
+    <ul class="pagination justify-content-center">
+      {% if products.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ products.previous_page_number }}">Previous</a>
+      </li>
+      {% endif %}
+      
+      {% for num in products.paginator.page_range %}
+      <li class="page-item {% if num == products.number %}active{% endif %}">
+        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+      </li>
+      {% endfor %}
+      
+      {% if products.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ products.next_page_number }}">Next</a>
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
+  
+{% comment %}   
+  <a href="/add_product/" class="btn btn-primary">Add New Product</a> {% endcomment %}
+{% endblock %}

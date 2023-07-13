@@ -1,0 +1,79 @@
+{% extends 'userprofile/user_base_1.html' %}
+{% block content %}
+<div>
+    <div class="container p-1">
+        <h2>My Order Details</h2><br>        
+            <!--Card Body Starts-->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mt-1">Order Number : {{order.order_number}}</h6>                                    
+                </div>
+            </div>
+            <br>
+            <h6 class="mt-1">shipped to : </h6>
+            <p>{{order.shipping_address}}</p>
+            <br>
+            <h6 class="mt-1">Order Items : </h6>                                    
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Variant</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                    {% for order_item in order.orderitem_set.all %}
+                    <tr>
+                        <td>{{ order_item.product.name }}</td>
+                        <td>{{ order_item.variant.variant_value }}{{ order_item.variant.product.unit_of_measurement.unit }}</td>
+                        <td>{{ order_item.quantity }}</td>
+                        <td>{{ order_item.price }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td> </td>
+                        <td> </td>
+                        <td>Shipment Cost :</td>
+                        <td>{{ order.shipment_cost }}</td>
+                    </tr>
+                    <tr>
+                        <td> </td>
+                        <td> </td>
+                        <td>Total Bill:</td>
+                        <td>{{ order.get_cart_total }}</td>
+                    </tr>
+                        
+                    
+                </tbody>
+            </table>
+            <!--Card Body Ends-->
+            {% comment %} <form action="{% url 'order_cancellation' order.id %}" method="POST"> {% endcomment %}
+            <form action="/userprofile/my_order_cancel/{{order.pk}}/" method="POST">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this order?')">Cancel Order</button>
+            </form>                   
+    </div>
+</div>
+
+
+<!---CANCEL ORDER CONFIRMATION-->
+<script>
+  const cancelOrderBtn = document.getElementById('cancel-order-btn');
+  
+  cancelOrderBtn.addEventListener('click', function(event) {
+    event.preventDefault();
+    
+    const confirmation = confirm('Are you sure you want to cancel this order?');
+    
+    if (confirmation) {
+      // If the user confirms, submit the form
+      event.target.closest('form').submit();
+    }
+  });
+</script>
+
+
+{% endblock content %} 

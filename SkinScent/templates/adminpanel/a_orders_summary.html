@@ -1,0 +1,28 @@
+{% extends 'adminpanel/a_base1.html' %}
+
+{% block content %}
+<h1>Order Summary</h1>
+<table>
+  <thead>
+    <tr>
+      <th>Order Number</th>
+      <th>Total Bill</th>
+      <th>Payment Status</th>
+      <th>Payment Method</th>
+      <th>Delivery Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for order in orders %}
+    <tr>
+      {% comment %} <td>{{ order.order_number }}</td> {% endcomment %}
+      <td><a href="/adminpanel/order_detail/{{order.pk}}/">{{ order.order_number }}</a></td>
+      <td>{{ order.get_cart_total }}</td>
+      <td>{{ order.payment_status }}</td>
+      <td>{{ order.payment_method }}</td>
+      <td>{{ order.fulfillment_status }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

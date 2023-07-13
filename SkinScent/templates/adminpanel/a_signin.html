@@ -1,0 +1,33 @@
+{% extends 'adminpanel/a_base0.html' %}
+
+{% block content %}
+<div class="container user-login-container">
+    <h2 class="mt-4">Skin&nbsp;&amp;&nbsp;Scent Administration</h2>
+    <form id="signInForm" class="mt-4" method="POST" action='/adminpanel/admin_signin/'>
+        {% csrf_token %}
+        {% if error_message %}
+        <div class="mt-3 alert alert-danger alert-dismissible fade show" role="alert">                            
+            {{ error_message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        {% endif %}     
+    <div class="mb-3">
+        <label for="username" class="form-label">Username:</label>
+        <input type="text" id="username" name="username" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label for="password" class="form-label">Password:</label>
+        <input type="password" id="password" name="password" class="form-control" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Sign In</button>
+    <div class="mt-3">
+        {% comment %} <a href="/adminpanel/admin_signin/" class="me-2">Forgot Password?</a> {% endcomment %}
+        {% comment %} <span>|</span> {% endcomment %}
+        {% comment %} <a href="/signup" class="ms-2">Sign Up</a> {% endcomment %}
+        {% comment %} <a href="{% url 'shop:user-register' %}" class="ms-2">Sign Up</a> {% endcomment %}
+    </div>
+    </form>
+</div>
+{% endblock content %}

@@ -1,0 +1,61 @@
+{% extends 'adminpanel/a_base1.html' %}
+
+
+{% block content %} 
+                     
+  <h2>Category Management</h2>
+  <form id="addCategory" method="post" class="mt-4" action="/adminpanel/add_cat/">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="category_name" class="form-label">Category Name:</label>
+      <input type="text" name="category_name" id="category_name" class="form-control" required>
+      {% comment %} <div class="invalid-feedback">Please enter the category name.</div> {% endcomment %}
+    </div>
+    
+    <div class="mb-3">
+      <label for="slug_name" class="form-label">Slug Name:</label>
+      <input type="text" name="slug_name" id="slug_name" class="form-control" readonly placeholder="auto-generated">
+      {% comment %} <div class="invalid-feedback">Please enter the slug name.</div> {% endcomment %}
+    </div>
+    
+    {% comment %} <div class="mb-3">
+      <label for="parent" class="form-label">Parent:</label>
+      <select name="parent" id="parent" class="form-select">
+        <option value="">None</option>
+        <!-- Add options dynamically based on available categories -->
+      </select>
+    </div> {% endcomment %}
+    
+    <div class="mb-3">
+      <label for="description" class="form-label">Description:</label>
+      <textarea name="description" id="description" class="form-control" required></textarea>
+      {% comment %} <div class="invalid-feedback">Please enter the description.</div> {% endcomment %}
+    </div>
+    
+    {% comment %} <div class="mb-3">
+      <label for="images" class="form-label">Images:</label>
+      <input type="file" name="images" id="images" class="form-control" multiple>
+    </div> {% endcomment %}
+    
+    <button type="submit" class="btn btn-primary">Save</button><span>||</span><a href="/adminpanel/list_cat/">Cancel</a>
+  </form>
+  
+  {% comment %} <script>
+    // Add Bootstrap validation styles to the form
+    (function () {
+      'use strict';
+      var forms = document.querySelectorAll('.needs-validation');
+      Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+          if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          form.classList.add('was-validated');
+        }, false);
+      });
+    })();
+  </script> {% endcomment %}
+
+
+{% endblock content %} 

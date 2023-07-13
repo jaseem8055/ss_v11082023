@@ -1,0 +1,107 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Skin&Scent - The complete Body Shop</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="Free HTML Templates" name="keywords">
+    <meta content="Free HTML Templates" name="description">
+
+    <!-- Favicon -->
+    {% comment %} <link href="img/favicon.ico" rel="icon"> {% endcomment %}
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"> 
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    {% comment %} <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet"> {% endcomment %}
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <style>
+        .user-login-container{
+            max-width: 400px;
+        }
+    </style>
+    
+</head>
+
+<body>
+    <!-- Topbar Start -->
+    <div class="row align-items-center py-3 px-xl-5">
+            <div class="col-lg-3 d-none d-lg-block">
+                <a href="" class="text-decoration-none">
+                    <h1 class="m-0 display-5 font-weight-semi-bold"><span class="text-primary font-weight-bold border px-1 mr-1">Skin&nbsp;&amp;&nbsp;Scent</span></h1>
+                </a>
+            </div>
+        </div>    
+    <!-- Topbar End -->
+
+
+    <!-- Navbar Start -->
+    <div class="container-fluid mb-5">
+        <div class="row border-top px-xl-5">        
+
+            <!-- Menubar -->
+            <div class="col-lg-9">               
+                          
+                <!-- Dynamic Part -->   
+                <main>
+                    {% block content %}                    
+                    {% endblock content %}                    
+                </main>
+                <!-- Dynamic Part END --> 
+
+            </div>
+            <!-- Menubar End-->
+            
+        </div>
+    </div>
+    <!-- Navbar End -->
+
+
+    <!-- Footer Start -->
+    <div class="container-fluid bg-secondary text-dark mt-5 pt-5">        
+        <div class="row border-top border-light mx-xl-5 py-4">
+            <div class="col-md-6 px-xl-0">
+                <p class="mb-md-0 text-center text-md-left text-dark">
+                    &copy; <a class="text-dark font-weight-semi-bold" href="#">Your Site Name</a>. All Rights Reserved. Designed
+                    by
+                    <a class="text-dark font-weight-semi-bold" href="https://htmlcodex.com">HTML Codex</a><br>
+                    Distributed By <a href="https://themewagon.com" target="_blank">ThemeWagon</a>
+                </p>
+            </div>
+            <div class="col-md-6 px-xl-0 text-center text-md-right">
+                {% comment %} <img class="img-fluid" src="img/payments.png" alt=""> {% endcomment %}
+            </div>
+        </div>
+    </div>
+    <!-- Footer End -->
+
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
+
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    {% comment %} <script src="lib/easing/easing.min.js"></script> {% endcomment %}
+    {% comment %} <script src="lib/owlcarousel/owl.carousel.min.js"></script> {% endcomment %}
+
+    <!-- Contact Javascript File -->
+    {% comment %} <script src="mail/jqBootstrapValidation.min.js"></script> {% endcomment %}
+    {% comment %} <script src="mail/contact.js"></script> {% endcomment %}
+
+    <!-- Template Javascript -->
+    {% comment %} <script src="js/main.js"></script> {% endcomment %}
+</body>
+
+</html>

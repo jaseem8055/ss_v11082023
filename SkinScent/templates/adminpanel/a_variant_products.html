@@ -1,0 +1,65 @@
+{% extends 'adminpanel/a_base1.html' %}
+
+{% block content %}
+  <h4>Product Management/Variants</h4>
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Product Name</th>
+        <th>Category</th>
+        <th>Unit</th>
+        <th>Description</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for product in products %}
+      <tr>
+        <td>{{ product.product_id }}</td>
+        <td>{{ product.name }}</td>
+        <td>{{ product.category }}</td>
+        {% comment %} <td>{{ product.unit_of_measurement }}</td> {% endcomment %}
+        <td>{{ product.unit_of_measurement.unit }}</td>
+        <td>{{ product.description }}</td>
+        <td>
+          {% if product.is_blocked %}
+          <a href="#"  class="btn btn-danger disabled" style="background-color: white; color: red;">BLOCKED</a>
+          {% else %}
+          {% comment %} <a href="/block_product/{{ product.pk }}/">Block</a> {% endcomment %}
+          <a href="/adminpanel/list_variant/{{ product.pk }}/">View Variants</a>
+          {% comment %} <span>|</span>
+          <a href="/edit_product/{{ product.pk }}/">View</a> {% endcomment %}
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  
+  <nav aria-label="Product pagination">
+    <ul class="pagination justify-content-center">
+      {% if products.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ products.previous_page_number }}">Previous</a>
+      </li>
+      {% endif %}
+      
+      {% for num in products.paginator.page_range %}
+      <li class="page-item {% if num == products.number %}active{% endif %}">
+        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+      </li>
+      {% endfor %}
+      
+      {% if products.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ products.next_page_number }}">Next</a>
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
+  
+  
+  {% comment %} <a href="/adminpanel/add_product/" class="btn btn-primary">Add New Product</a> {% endcomment %}
+{% endblock %}

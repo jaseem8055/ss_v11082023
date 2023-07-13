@@ -1,0 +1,52 @@
+{% extends 'base2.html' %}
+
+{% block content %}
+
+<!-- Page Header Start -->
+<div class="container-fluid bg-secondary mb-5">
+    <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
+        <h1 class="font-weight-semi-bold text-uppercase mb-3">Order Success</h1>
+        <div class="d-inline-flex">
+            <p class="m-0"><a href="">Home</a></p>
+            <p class="m-0 px-2">-</p>
+            <p class="m-0">Order Success</p>
+        </div>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<div class="container">
+    
+    <div class="card p-3">
+        <div class="card-header">
+            <h1 class="m-auto">Order Placed Successfully!</h1>
+        </div>
+        <h3 class="mt-4">Order Number:</h3>
+        <p class="fw-bold">{{ order.order_number }}</p>
+        <h3 class="mt-4">Shipping Address:</h3>
+        <p class="fw-bold"> {{ order.shipping_address }}</p>
+        <h3 class="mt-4">Order Items:</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Variant</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order_item in order.orderitem_set.all %}
+                <tr>
+                    <td>{{ order_item.product.name }}</td>
+                    <td>{{ order_item.variant.variant_value }} {{ order_item.product.unit_of_measurement.unit }}</td>
+                    <td>{{ order_item.quantity }}</td>
+                    <td>{{ order_item.price }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock content %} 

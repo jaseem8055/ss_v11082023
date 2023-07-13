@@ -1,0 +1,13 @@
+{% extends 'adminpanel/a_base1.html' %}
+{% block content %}
+  <h1>Variant Added Successfully!</h1>
+
+{% comment %} <p>Are you sure you want to block the category "{{ category.name }}"?</p> {% endcomment %}
+
+<form method="post" action="/adminpanel/list_variant/{{ product_id }}/">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Go Back</button>
+    {% comment %} <a href="/list_cat/" class="btn btn-secondary">Cancel</a> {% endcomment %}
+</form>
+
+{% endblock %}

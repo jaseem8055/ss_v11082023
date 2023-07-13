@@ -1,0 +1,78 @@
+{% extends 'adminpanel/a_base1.html' %}
+
+{% block content %}
+<h4>Product Management/Edit Product</h4>
+
+{% comment %} <form method="POST" action="/edit_product/{{product.pk}}/" enctype="multipart/form-data"> {% endcomment %}
+<form method="POST" action="/adminpanel/edit_product/{{ product.pk }}/" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="product-name" class="form-label">Product Name</label>
+      <input type="text" class="form-control" id="product-name" name="name" value="{{ product.name }}" required>
+    </div>
+    <div class="mb-3">
+      <label for="product-category" class="form-label">Category</label>
+      <select class="form-select" id="product-category" name="category" required>
+        <option value="" disabled selected>Select a category</option>
+        <!-- Render category options here -->
+        {% for category in categories %}
+          <option value="{{ category.id }}" {% if category.id == product.category_id %}selected{% endif %}>{{ category.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="product-unit" class="form-label">Unit of Measurement</label>
+      <select class="form-select" id="product-unit" name="unit" required>
+        <option value="" disabled selected>Select a unit</option>
+        <!-- Render unit options here -->
+        {% for unit in units %}
+          <option value="{{ unit.id }}" {% if unit.id == product.unit_of_measurement_id %}selected{% endif %}>{{ unit.name }}</option>
+        {% endfor %}
+      </select>
+      <a href="#">List of Units</a>
+      {% comment %} <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-unit-modal">List of Units</button> {% endcomment %}
+      
+    </div>
+    <div class="mb-3">
+      <label for="product-description" class="form-label">Description</label>
+      <textarea class="form-control" id="product-description" name="description" rows="3" required>{{ product.description }}</textarea>
+    </div>
+
+    <div class="container-fluid pt-5">
+        <h6>Images</h6>
+        <div class="row px-xl-5 pb-3">            
+            {% for image in images %}
+            <!--Image Card-->
+            <div class="col-lg-4 col-md-6 pb-1">
+                <div class="cat-item d-flex flex-column border mb-4" style="padding: 30px;">
+                    
+                    <a href="" class="cat-img position-relative overflow-hidden mb-3">
+                      
+                        <img class="img-fluid " src="{{ image.image.url }}" alt="">
+                        
+                        
+                    </a>
+                    
+                </div>
+            </div>
+            {% endfor %}
+            <!--Image Card-->
+        </div>
+    </div>  
+    
+
+    <div class="form-group">
+        <label for="new_images">Upload New Images</label>
+        {% comment %} <input type="file" class="form-control-file" id="new_images" name="new_images" multiple>  <!-- Allow multiple file uploads --> {% endcomment %}
+        <input type="file" class="form-control" id="product-images" name="new_images" accept="image/*" multiple onchange="previewImages(event)">
+        <div id="image-preview-container"></div>
+    </div>
+
+    
+      <button type="submit" class="btn btn-primary">Update</button>
+      <span>||</span>
+      <a href="/adminpanel/list_product/">Go Back</a>
+  </form>
+
+{% endblock %}

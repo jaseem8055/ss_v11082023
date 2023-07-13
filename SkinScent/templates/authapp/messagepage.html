@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="alert alert-primary" role="alert">
+    {{ message }}
+</div>
+{% if login_url != '#' %}
+<a href="/authapp/signin/">Go to Login</a>
+{% endif %}    
+
+{% endblock content %}  

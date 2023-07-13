@@ -1,0 +1,58 @@
+{% extends 'userprofile/user_base_1.html' %}
+{% block content %}
+<h2>Address List</h2>
+
+{% if default_address %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-6">            
+                <!---DEFAULT ADDRESS-->
+                <div class="card">
+                  <div class="card-header">
+                    Default Address
+                  </div>
+                  <div class="card-body">
+                    <p>{{ default_address.address.addressee }}</p>
+                    <p>{{ default_address.address.address_line1 }}</p>
+                    <p>{{ default_address.address.street }}</p>
+                    <p>{{ default_address.address.city }}, {{ default_address.address.state }}</p>
+                    <p>{{ default_address.address.country }}, Pincode: {{ default_address.address.pin_code }}</p>
+                  </div>
+                </div>
+                {% endif %}
+                <!---DEFAULT ADDRESS-->           
+        </div>
+    </div>
+    
+</div>
+
+<br>
+<div class="container mt=3 mb=3">
+    <a href="/userprofile/add_address/" class="btn btn-primary">Add New Address</a>
+</div>
+<br>
+
+<div class="container">
+    <div class="row">
+        {% for address in addresses %}
+        <div class="col-lg-4">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">{{ address.addressee }}</h5>
+                    <p class="card-text">{{ address.address_line1 }}</p>
+                    <p class="card-text">{{ address.street }}</p>
+                    <p class="card-text">{{ address.city }}, {{ address.state }}</p>
+                    <p class="card-text">{{ address.country }}, {{ address.pin_code }}</p>
+                    <a href="/userprofile/edit_address/{{ address.pk }}/" class="btn btn-primary">Edit</a>
+                    {% comment %} <a href="/userprofile/remove_address/{{ address.pk }}/" class="btn btn-danger">Remove</a> {% endcomment %}
+                    <a href="/userprofile/remove_address/{{ address.pk }}/" class="btn btn-danger" onclick="return confirm('Are you sure you want to remove this address?')">Remove</a>
+
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock content %} 

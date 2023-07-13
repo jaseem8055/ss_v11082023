@@ -1,0 +1,217 @@
+{% extends 'base2.html' %}
+
+{% block content %}
+
+    <!-- Page Header Start -->
+    <div class="container-fluid bg-secondary mb-1">
+        <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
+            <h1 class="font-weight-semi-bold text-uppercase mb-3">Shopping Cart</h1>
+            <div class="d-inline-flex">
+                <p class="m-0"><a href="">Home</a></p>
+                <p class="m-0 px-2">-</p>
+                <p class="m-0">Shopping Cart</p>
+            </div>
+        </div>
+    </div>
+    <!-- Page Header End -->
+
+    <!-- Menubar -->
+    <div class="col-lg-12">
+        <nav class="navbar navbar-expand-lg bg-light navbar-light py-3 py-lg-0 px-0">
+            <a href="" class="text-decoration-none d-block d-lg-none">
+                <h1 class="m-0 display-5 font-weight-semi-bold"><span class="text-primary font-weight-bold border px-3 mr-1">Skin&nbsp;&amp;&nbsp;Scent</span></h1>
+            </a>
+            <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
+                <div class="navbar-nav mr-auto py-0">
+                    <a href="/" class="nav-item nav-link active">Home</a>
+                    {% comment %} <a href="shop.html" class="nav-item nav-link">Shop</a> {% endcomment %}
+                    <a href="/" class="nav-item nav-link">Shop</a>
+                    {% comment %} <a href="detail.html" class="nav-item nav-link">Shop Detail</a> {% endcomment %}
+                    <a href="/" class="nav-item nav-link">Shop Detail</a>
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Pages</a>
+                        <div class="dropdown-menu rounded-0 m-0">
+                            {% comment %} <a href="cart.html" class="dropdown-item">Shopping Cart</a> {% endcomment %}
+                            <a href="/" class="dropdown-item">Shopping Cart</a>
+                            {% comment %} <a href="checkout.html" class="dropdown-item">Checkout</a> {% endcomment %}
+                            <a href="/" class="dropdown-item">Checkout</a>
+                        </div>
+                    </div>
+                    {% comment %} <a href="contact.html" class="nav-item nav-link">Contact</a> {% endcomment %}
+                    <a href="/contact" class="nav-item nav-link">Contact</a>
+                </div>
+                <div class="navbar-nav ml-auto py-0">
+                    {% if username != None %}
+                    {% comment %} <a href="#" class="nav-item nav-link">{{username}}</a> {% endcomment %}
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link" data-toggle="dropdown">{{username}}<i class="fa fa-angle-down float-right mt-1"></i></a>
+                        <div class="dropdown-menu position-absolute bg-secondary border-0 rounded-0 w-100 m-0">
+                            <a href="" class="dropdown-item">Profile Settings</a>
+                            <a href="/authapp/signout/" class="dropdown-item">Logout</a>                                    
+                        </div>
+                    </div>
+                    {% else %}
+                    <a href="/authapp/signin/" class="nav-item nav-link">Login</a>
+                    {% endif %}
+                    <a href="/authapp/signup/" class="nav-item nav-link">Register</a>
+                </div>
+            </div>
+        </nav>
+    </div>
+    <!-- Menubar -->
+
+    <!-- Cart Start -->
+    <div class="container-fluid pt-5">
+        <div class="row px-xl-5">
+            <div class="col-lg-8 table-responsive mb-5">
+                <table class="table table-bordered text-center mb-0">
+                    <thead class="bg-secondary text-dark">
+                        <tr>
+                            <th>Products</th>
+                            <th>Variant</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Total</th>
+                            <th>Remove</th>
+                            <th>In Stock</th>
+
+                        </tr>
+                    </thead>
+                    <tbody class="align-middle">
+                        {% for cart_item in cart_items  %}
+                        <tr>
+                            <td class="align-middle"><img src="" alt="" style="width: 50px;"> {{ cart_item.product.name }}</td>
+                            <td class="align-middle">{{ cart_item.get_variant_value }}{{ cart_item.product.unit_of_measurement.unit }}</td>
+                            
+                            <td class="align-middle">
+                                <div class="input-group quantity mx-auto" style="width: 100px;">
+                                    <div class="input-group-btn">
+                                        <button class="btn btn-sm btn-primary btn-minus">
+                                            <i class="fa fa-minus"></i>
+                                        </button>
+                                    </div>
+                                    {% comment %} <input type="text" class="form-control form-control-sm bg-secondary text-center quantity-input" value="1" data-max-quantity="{{ cart_item.variant.quantity }}" data-variant-id="{{ cart_item.variant.id }}"> {% endcomment %}
+                                    <input type="text" class="form-control form-control-sm bg-secondary text-center quantity-input" value="{{ cart_item.quantity }}" min="1" max="{{ cart_item.variant.quantity }}" data-max-quantity="{{ cart_item.variant.quantity }}" data-variant-id="{{ cart_item.variant.id }}" data-cart-item-id="{{ cart_item.id }}">
+
+                                    <div class="input-group-btn">
+                                        <button class="btn btn-sm btn-primary btn-plus">
+                                            <i class="fa fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="align-middle item-price">₹{{ cart_item.variant.price }}</td>
+                            <td class="align-middle item-total">₹{{ cart_item.get_item_total }}</td>
+                            {% comment %} <td class="align-middle"><button class="btn btn-sm btn-primary"><i class="fa fa-times"></i></button></td> {% endcomment %}
+                            <td class="align-middle">
+                                <a href="/remove_cart_item/{{ cart_item.id }}/" onclick= "return confirm('Are you sure, want to remove this item?')">
+                                    <button class="btn btn-sm btn-primary">
+                                        <i class="fa fa-times"></i>
+                                    </button>
+                                </a>
+                            </td>
+                            
+                            <td class="align-middle stock">{{ cart_item.variant.quantity }}</td>
+                        </tr>
+                        {% endfor %}                        
+                    </tbody>
+                </table>
+                <div style="text-align: end;">
+                    <a href="/">
+                        <button class="btn btn-primary mt-3 py-1" id ="update-cart-items-btn">Add More Products</button>
+                    </a>
+                </div>                  
+            </div>
+            
+            <div class="col-lg-4">
+                {% comment %} <form class="mb-5" action="">
+                    <div class="input-group">
+                        <input type="text" class="form-control p-3" placeholder="Coupon Code">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary">Apply Coupon</button>
+                        </div>
+                    </div>
+                </form> {% endcomment %}
+                <div class="card border-secondary mb-5">
+                    <div class="card-header bg-secondary border-0">
+                        <h4 class="font-weight-semi-bold m-0">Cart Summary</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-3 pt-1">
+                            <h6 class="font-weight-medium">Subtotal</h6>
+                            <h6 class="font-weight-medium" id="subtotal">₹0</h6>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <h6 class="font-weight-medium">Shipping</h6>
+                            <h6 class="font-weight-medium">₹10</h6>
+                        </div>
+                    </div>
+                    <div class="card-footer border-secondary bg-transparent">
+                        <div class="d-flex justify-content-between mt-2">
+                            <h5 class="font-weight-bold">Total</h5>
+                            <h5 class="font-weight-bold" id="total">₹0</h5>
+                        </div>
+                        <a href="/checkout/">                            
+                            
+                            {% if sub_total == 0 %}
+                            <button class="btn btn-block btn-primary my-3 py-3" id="proceed-to-checkout-btn" disabled>Proceed To Checkout</button>
+                            {% else %}
+                            <button class="btn btn-block btn-primary my-3 py-3" id="proceed-to-checkout-btn">Proceed To Checkout</button>
+                            {% endif %}
+                                                      
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Cart End -->
+    
+
+     <!----UPDATE CARTITEM Model---->
+     <script>
+        /////////////////////////
+        // Update CartItem Model
+        /////////////////////////
+        const updateCartItems = () => {
+          const quantityInputs = document.getElementsByClassName('quantity-input');
+          const cartItemsQty = [];
+      
+          for (let i = 0; i < quantityInputs.length; i++) {
+            const cartItemId = quantityInputs[i].getAttribute('data-cart-item-id');
+            const quantity = quantityInputs[i].value;
+            cartItemsQty.push({ cartItemId, quantity });
+          }
+      
+          const cartQtyList = {
+            cartItemsQty: cartItemsQty
+          };
+      
+          console.log(cartItemsQty);
+
+          fetch('/update-cart-items/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': '{{ csrf_token }}' // Include the CSRF token if required by your Django project's settings
+            },
+            body: JSON.stringify(cartQtyList)
+          })
+
+          console.log("Hi");            
+          
+        };
+      
+        const updateCartItemsBtn = document.getElementById('update-cart-items-btn');
+        updateCartItemsBtn.addEventListener('click', updateCartItems);
+        
+        const proceedToCheckoutBtn = document.getElementById('proceed-to-checkout-btn');
+        proceedToCheckoutBtn.addEventListener('click', updateCartItems);
+      </script>
+
+
+
+{% endblock content %} 

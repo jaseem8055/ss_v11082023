@@ -1,0 +1,15 @@
+{% extends 'adminpanel/a_base1.html' %}
+
+
+{% block content %}
+  <h1>Block Product Confirmation</h1>
+
+<p>Are you sure you want to block the category "{{ product.name }}"?</p>
+
+<form method="post" action="/adminpanel/block_product/{{ product.pk }}/">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Confirm</button>
+    <a href="/adminpanel/list_product/" class="btn btn-secondary">Cancel</a>
+</form>
+
+{% endblock %}

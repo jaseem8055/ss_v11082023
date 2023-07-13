@@ -1,0 +1,83 @@
+{% extends 'adminpanel/a_base1.html' %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle ">
+                    <thead class="table-success">
+                        <tr>
+                            <th>Photo</th>
+                            <th>Username</th>
+                           
+                            <th>Email</th>
+                            <th>Is_active</th>
+                            <th>Is_superuser</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-group-divider">
+                    
+                        
+                        {% for user in users %}
+                    
+                        <tr class="text-black">
+                            <td scope="row"><img src="http://static.everypixel.com/ep-pixabay/0329/8099/0858/84037/3298099085884037069-head.png" width="60px" height="60px" alt=""></td>
+                            {% if user.is_superuser %}
+                            <td>{{user.username}}   <i class="fa-solid fa-circle" style="color: #0fbe0c;font-size:small;"></i></td>
+                            {% else %}
+                            <td>{{user.username}}</td>
+
+                            {% endif %}
+                            
+                            <td>{{user.email}}</td>
+                            <td>{{user.is_active}}</td>
+                            <td>{{user.is_superuser}}</td>
+                            <td>
+                                {% comment %} <a class="btn btn-primary me-2" href="{% url 'update' user.id %}" role="button">Update</a> {% endcomment %}
+                                {% comment %} <a class="btn btn-primary me-2" href="" role="button">Update</a> {% endcomment %}
+                                {% comment %} <a class="btn btn-danger" href="{% url 'delete-user' user.id %}" onclick= "return confirm('Are you sure you want to delete this item')" role="button">Delete</a> {% endcomment %}
+                                {% if user.is_active %}
+                                <a class="btn btn-danger" href="/adminpanel/block_user/{{user.id}}" onclick= "return confirm('Are you sure you want to block this item?')" role="button">Block</a>
+                                {% else %}
+                                <a class="btn btn-warning" href="/adminpanel/unblock_user/{{user.id}}" onclick= "return confirm('Are you sure you want to un-block this item?')" role="button">Un-Block</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    
+
+                        </tr>
+                    </tbody>
+                    <tfoot>
+
+                    </tfoot>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
