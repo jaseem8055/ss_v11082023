@@ -1,0 +1,190 @@
+{% extends 'base3.html' %}
+
+{% block content %}
+
+    <!---BASE 3-->
+
+    <!-- Page Header Start -->
+    <div class="container-fluid bg-secondary mb-5">
+        <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
+            <h1 class="font-weight-semi-bold text-uppercase mb-3">Offers</h1>
+            <div class="d-inline-flex">
+                <p class="m-0"><a href="/">Home</a></p>
+                <p class="m-0 px-2">-</p>
+                <p class="m-0">Offers</p>
+            </div>
+        </div>
+    </div>
+    <!-- Page Header End -->
+
+
+    <!-- Shop Start -->
+    <div class="container-fluid pt-5">            
+        
+        <div class="row px-xl-5">
+            <!-- Shop Sidebar Start -->
+            
+            <!-- Shop Sidebar End -->
+
+            <!-- Shop Product Start -->            
+            <div class="col-lg-12 col-md-12">                
+                <div class="row pb-1">                    
+                    <!--IMAGE CARD-->
+                    {% for offer, product_offers in offer_dict.items %}
+                    <div class="col-12">
+                        <!-- Display offer name as a heading -->
+                         <h5 class="offer-heading">{{ offer.name }}</h5>
+                         <span class="date-range">  Ongoing from {{  offer.start_date|date:'Y-m-d' }} till {{ offer.end_date|date:'Y-m-d' }}</span>                    
+                    </div>                    
+                        {% for data in product_offers %}
+                            {% with product_offer=data.product_offer first_image=data.first_image %}                
+                                <div class="col-lg-3 col-md-6 col-sm-12 pb-1">                        
+                                    <div class="card product-item border-0 mb-4">
+                                        <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
+                                            <img class="img-fluid w-100" src="{{ first_image.image.url }}" alt="{{ product_offer.product.name }}">
+                                        </div>
+                                        <div class="card-body border-left border-right text-center p-0 pt-4 pb-3">
+                                            <h6 class="text-truncate mb-3">{{ product_offer.product.name }}</h6>
+                                            {% comment %} d-flex justify-content-center                             {% endcomment %}
+                                            <div class="discount-percentage">
+                                                <h6>{{ product_offer.discount_percentage }}% Discount</h6>
+                                                {% comment %} <h6 class="text-muted ml-2"><del>₹{{ variant.0.price }}</del></h6> {% endcomment %}
+                                            </div>
+                                            
+                                        </div>
+                                        <div class="card-footer d-flex justify-content-between bg-light border">                               
+                                            <!-- Access the product_id here -->
+                                            <a href="/product_detail/{{ first_image.product.product_id }}/" class="btn btn-sm text-dark p-0"><i class="fas fa-eye text-primary mr-1"></i>View Detail</a>                                
+                                                                                        
+                                            
+                                            {% if first_image.product.product_id in product_ids %}
+                                                <form action="/wishlist/" method="post">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-sm text-dark p-0">View in Wishlist</button>
+                                                </form>
+                                            {% else %}
+                                                <form id="addWishlistForm">
+                                                    {% csrf_token %}
+                                                    <button type="button" class="btn btn-sm text-dark p-0" onclick="addToWishlist({{ first_image.product.product_id }})">
+                                                        <i class="fas fa-heart text-primary"></i>Add To Wishlist
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endwith %}
+                        {% endfor %}
+                    {% endfor %}
+                    
+                    {% comment %} {% endfor %}                     {% endcomment %}
+                    <!--IMAGE CARD-->
+                    
+                     <!--PAGINATOR-->
+                     <div class="col-12 pb-1">
+                        <nav aria-label="Product pagination">
+                            <ul class="pagination justify-content-center">
+                              {% if images.has_previous %}
+                              <li class="page-item">
+                                <a class="page-link" href="?page={{ images.previous_page_number }}">Previous</a>
+                              </li>
+                              {% endif %}
+                              
+                              {% for num in images.paginator.page_range %}
+                              <li class="page-item {% if num == images.number %}active{% endif %}">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                              </li>
+                              {% endfor %}
+                              
+                              {% if images.has_next %}
+                              <li class="page-item">
+                                <a class="page-link" href="?page={{ images.next_page_number }}">Next</a>
+                              </li>
+                              {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                    <!--PAGINATOR-->
+
+                </div>
+            </div>
+            <!-- Shop Product End -->
+        </div>
+    </div>
+    <!-- Shop End -->
+
+    <!---BASE 3-->    
+  
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        function addToWishlist(product_id) {
+            $.ajax({
+                url: '/add_to_wishlist/' + product_id + '/',
+                type: 'POST', // or 'GET' depending on your server-side implementation
+                dataType: 'json',                
+                headers: { "X-CSRFToken": "{{ csrf_token }}" },
+                success: function (data) {
+                    // Handle the success response here (optional)
+                    //window.location.reload();
+                    //alert('Product added to wishlist!');
+                    //console.log("Count =", data.count)
+                    //updateWishlistCount(product_id, data.count); // Update the count in the UI
+                    var addButton = $('#addWishlistForm');
+                    var viewButton = '<form action="/wishlist/" method="post">{% csrf_token %}<button type="submit" class="btn btn-sm text-dark p-0">View in Wishlist</button></form>';
+                    addButton.replaceWith(viewButton);
+                },
+                error: function (error) {
+                    // Handle the error response here (optional)
+                    console.log('Error:', error);
+                }
+            });
+        }
+
+        function updateWishlistCount(product_id, count) {
+            // Update the count in the UI for the specific product
+            document.getElementById('wishlist-count').innerText = count; 
+            //var wishlistCountElement = $('.wishlist-count');
+            //var badge = wishlistCountElement.filter('[data-product-id="' + product_id + '"]');
+            //badge.text(count);
+        }
+        
+        </script>
+
+        <style>
+            /* CSS styles for the discount percentage */
+            .discount-percentage {
+                /* Customize the font size, color, background color, or any other visual properties */
+                display: inline-block;
+                font-size: 16px;
+                font-weight: bold;
+                color: #000000; /* Black color for the text */
+                background-color: #FFD700; /* Golden Yellow background color */
+                /* Add any additional styles you want */
+                padding: 4px 8px; /* Add padding to create space around the text */
+                border-radius: 10px; /* Add border-radius for rounded corners */
+            }
+
+            /* CSS styles for the date range */
+            .date-range {
+                color: #999999; /* Lighter color for the span element */
+            }
+
+            /* CSS styles for the offer name heading */
+            .offer-heading {
+                color: #FFD700; /* Golden yellow color for the heading text */
+                font-size: 24px; /* Adjust the font size to your preference */
+                font-weight: bold; /* Make the text bold */
+                text-transform: uppercase; /* Convert text to uppercase */
+                margin-bottom: 10px; /* Add some bottom margin to create space */
+                /* Add any additional styles you want */
+            }
+
+
+        </style>
+        
+
+{% endblock content %}

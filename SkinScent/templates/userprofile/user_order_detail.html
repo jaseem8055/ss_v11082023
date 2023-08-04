@@ -1,60 +1,121 @@
 {% extends 'userprofile/user_base_1.html' %}
 {% block content %}
 <div>
-    <div class="container p-1">
-        <h2>My Order Details</h2><br>        
-            <!--Card Body Starts-->
-            <div class="card">
+    <div class="container p-3">
+            <h2>My Order Details</h2><br>       
+            
+            <div class="card p-3">                
                 <div class="card-header">
                     <h6 class="mt-1">Order Number : {{order.order_number}}</h6>                                    
                 </div>
-            </div>
-            <br>
-            <h6 class="mt-1">shipped to : </h6>
-            <p>{{order.shipping_address}}</p>
-            <br>
-            <h6 class="mt-1">Order Items : </h6>                                    
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Product</th>
-                        <th>Variant</th>
-                        <th>Quantity</th>
-                        <th>Price</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    
-                    {% for order_item in order.orderitem_set.all %}
-                    <tr>
-                        <td>{{ order_item.product.name }}</td>
-                        <td>{{ order_item.variant.variant_value }}{{ order_item.variant.product.unit_of_measurement.unit }}</td>
-                        <td>{{ order_item.quantity }}</td>
-                        <td>{{ order_item.price }}</td>
-                    </tr>
-                    {% endfor %}
-                    <tr>
-                        <td> </td>
-                        <td> </td>
-                        <td>Shipment Cost :</td>
-                        <td>{{ order.shipment_cost }}</td>
-                    </tr>
-                    <tr>
-                        <td> </td>
-                        <td> </td>
-                        <td>Total Bill:</td>
-                        <td>{{ order.get_cart_total }}</td>
-                    </tr>
+                <br>
+                <h6 class="mt-1">shipped to : </h6>
+                <p>{{order.shipping_address}}</p>            
+                <br>
+                <h6 class="mt-1">Payment Method : </h6>
+                <p>{{ order.payment_method }}</p>
+                <br>
+                <h6 class="mt-1">Order Items : </h6>                                    
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Variant</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                         
-                    
-                </tbody>
-            </table>
+                        {% for order_item in order.orderitem_set.all %}
+                        <tr>
+                            <td>{{ order_item.product.name }}</td>
+                            <td>{{ order_item.variant.variant_value }}{{ order_item.variant.product.unit_of_measurement.unit }}</td>
+                            <td>{{ order_item.quantity }}</td>
+                            <td>{{ order_item.price }}</td>
+                        </tr>
+                        {% endfor %}
+                        <tr>
+                            <td> </td>
+                            <td> </td>                        
+                            <td>Sub Total :</td>
+                            <td>{{ order.sub_total }}</td>
+                        </tr>
+                        <tr>
+                            <td> </td>
+                            <td> </td>                        
+                            <td>Discount :</td>
+                            <td>{{ order.coupon_discount }}</td>
+                        </tr>
+                        <tr>
+                            <td> </td>
+                            <td> </td>
+                            <td>Shipment Cost :</td>
+                            <td>{{ order.shipment_cost }}</td>
+                        </tr>
+                        <tr>
+                            <td> </td>
+                            <td> </td>
+                            <td>Total Bill:</td>
+                            <td>{{ total }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                {% if coupon_code != None %}
+                                In this Order, You have availed {{coupon_discount}}% discount by using Coupon Code: {{coupon_code}}
+                                {% endif %}
+                            </td>
+                        </tr>  
+                    </tbody>
+                </table>
+                <a href="{% url 'shop:download_pdf' order.pk %}" target="_blank">Download Invoice</a>      
+            </div><!----ITEMS TABLE CONTAINER ---->
             <!--Card Body Ends-->
             {% comment %} <form action="{% url 'order_cancellation' order.id %}" method="POST"> {% endcomment %}
-            <form action="/userprofile/my_order_cancel/{{order.pk}}/" method="POST">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this order?')">Cancel Order</button>
-            </form>                   
+            
+            
+            <div class="container p-3">
+                <h2>Order Tracking Status</h2>
+                <table class="tracking-table">
+                <tr>
+                    <td>Order Processed</td>
+                    <td>{% if track_order.order.created_at %}<span class="green-tick">&#10004;</span>{% endif %}</td>
+                    <td>{% if track_order.order.created_at %}{{ track_order.order.created_at }}{% endif %}</td>
+                    </tr>
+                <tr>
+                    <td>Shipped</td>
+                    <td>{% if track_order.shipped_date %}<span class="green-tick">&#10004;</span>{% endif %}</td>
+                    <td>{% if track_order.shipped_date %}{{ track_order.shipped_date }}{% endif %}</td>
+                </tr>
+                <tr>
+                    <td>Reached Delivery Center</td>
+                    <td>{% if track_order.delivery_center_date %}<span class="green-tick">&#10004;</span>{% endif %}</td>
+                    <td>{% if track_order.delivery_center_date %}{{ track_order.delivery_center_date }}{% endif %}</td>
+                </tr>
+                <tr>
+                    <td>Delivered</td>
+                    <td>{% if track_order.delivered_date %}<span class="green-tick">&#10004;</span>{% endif %}</td>
+                    <td>{% if track_order.delivered_date %}{{ track_order.delivered_date }}{% endif %}</td>
+                </tr>
+                </table>  
+            </div>    
+
+            
+
+
+            <div class="container py-3">
+                {% if order.fulfillment_status != 'Delivered' %}
+                    <form action="/userprofile/my_order_cancel/{{order.pk}}/" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this order?')">Cancel Order</button>
+                    </form>
+                {% else %}
+                    <form action="" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to return this order?')">Return Order</button>
+                    </form>
+                {% endif %}
+            </div>
     </div>
 </div>
 
@@ -74,6 +135,29 @@
     }
   });
 </script>
+
+<style>
+    .tracking-table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+  
+    .tracking-table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+  
+    .tracking-table tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+  
+    .green-tick {
+      color: green;
+      font-size: 16px;
+    }
+  </style>
+
 
 
 {% endblock content %} 

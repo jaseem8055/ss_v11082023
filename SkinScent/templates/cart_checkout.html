@@ -7,9 +7,10 @@
     <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
         <h1 class="font-weight-semi-bold text-uppercase mb-3">Checkout</h1>
         <div class="d-inline-flex">
-            <p class="m-0"><a href="">Home</a></p>
+            <p class="m-0"><a href="/">Home</a></p>
             <p class="m-0 px-2">-</p>
             <p class="m-0">Checkout</p>
+            <p class="m-0">- base2</p>
         </div>
     </div>
 </div>
@@ -154,18 +155,20 @@
                 <!---CHANGE ADDRESS-->
                 <div class="card">
                     <div class="col-md-6 form-group">
-                        <label for="change_address">Change Shipping Address</label>
+                        <label for="change_address">Select Your Shipping Address</label>
                         <select class="form-control" name="change_address" id="change_address">
                             <option value="">Select Address</option>
                             {% for address in addresses %}
                                 <option value="{{ address.id }}">{{ address.address_line1 }}, {{ address.street }}, {{ address.city }}, {{ address.state }}, {{ address.country }}, {{ address.pin_code }}</option>
                             {% endfor %}
-                        </select>
-                        <br> 
+                        </select>                    
                         <span><a href="#" id="ship_to_address">Ship to this Address</a></span>
                     </div>
                 </div>
                 <!---CHANGE ADDRESS-->
+                <div class="card">
+                    <span>Click Here to <a href="/userprofile/add_address/" id="">Add new Address</a></span>
+                </div>
             </div>
             <div class="col-lg-4">
                 <div class="card border-secondary mb-5">
@@ -185,14 +188,22 @@
                         <div class="d-flex justify-content-between mb-3 pt-1">
                             <h6 class="font-weight-medium">Subtotal</h6>
                             <h6 class="font-weight-medium">₹{{sub_total}}</h6>
-                            <input class="form-control" type="hidden" name="sub_total" value="{{sub_total}}">
+                            <input class="form-control" type="hidden" name="sub_total" id="sub_total" value="{{sub_total}}">
 
+                        </div>                        
+                        
+                        <div class="d-flex justify-content-between">
+                            <h6 class="font-weight-medium">Discount</h6>
+                            <h6 class="font-weight-medium">₹{{ discount_amount }}</h6>
+                            <input class="form-control" type="hidden" name="discount_amount" id="discount_amount" value="{{ discount_amount }}">
                         </div>
+
                         <div class="d-flex justify-content-between">
                             <h6 class="font-weight-medium">Shipping</h6>
-                            <h6 class="font-weight-medium">₹10</h6>
-                            <input class="form-control" type="hidden" name="shipment_cost" value="10">
+                            <h6 class="font-weight-medium">₹10.00</h6>
+                            <input class="form-control" type="hidden" name="shipment_cost" id="shipment_cost" value="10">
                         </div>
+                        
                     </div>
                     <div class="card-footer border-secondary bg-transparent">
                         <div class="d-flex justify-content-between mt-2">
@@ -208,31 +219,23 @@
                     <div class="card-body">
                         <div class="form-group">
                             <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" name="payment" id="cod" value="COD" required>
+                                <input type="radio" class="custom-control-input" name="payment" id="cod" value="COD" required onchange="toggleButtons()">
                                 <label class="custom-control-label" for="cod">COD</label>
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" name="payment" id="paypal" value="paypal" required>
-                                <label class="custom-control-label" for="paypal">Paypal</label>
+                                <input type="radio" class="custom-control-input" name="payment" id="razorpay" value="razorpay" required onchange="toggleButtons()">                                
+                                <label class="custom-control-label" for="razorpay">Razorpay</label>
                             </div>
                         </div>
-                        {% comment %} <div class="form-group">
-                            <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" name="payment" id="directcheck">
-                                <label class="custom-control-label" for="directcheck">Direct Check</label>
-                            </div>
-                        </div> {% endcomment %}
-                        {% comment %} <div class="">
-                            <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" name="payment" id="banktransfer">
-                                <label class="custom-control-label" for="banktransfer">Bank Transfer</label>
-                            </div>
-                        </div> {% endcomment %}
+                        
                     </div>
                     <div class="card-footer border-secondary bg-transparent">
-                        <button type="submit" class="btn btn-lg btn-block btn-primary font-weight-bold my-3 py-3">Place Order</button>
+                        {% comment %} <button type="submit" class="btn btn-lg btn-block btn-primary font-weight-bold my-3 py-3">Place Order</button> {% endcomment %}
+                        <button type="submit" class="btn btn-lg btn-block btn-primary font-weight-bold my-3 py-3" id="placeOrderButton" style="display: block;">Place Order</button>
+                        <button class="btn btn-lg btn-block btn-primary font-weight-bold my-3 py-3" id="rzp-button1" onclick="saveOrder()" style="display: none;">Pay with Razorpay</button>                        
+                        {% comment %} <button class="btn btn-lg btn-block btn-primary font-weight-bold my-3 py-3" id="rzp-button1" style="display: none;">Pay with Razorpay</button>                         {% endcomment %}
                     </div>
                 </div>
             </div>
@@ -248,10 +251,10 @@
     $(document).ready(function() {        
         $('#ship_to_address').click(function(event) {
             event.preventDefault();
-            console.log("Clicked")
+            //console.log("Clicked")
     
             var selectedAddressId = $('#change_address').val();
-            console.log("AddressId =",selectedAddressId )
+            //console.log("AddressId =",selectedAddressId )
             
             if (selectedAddressId !== '') {
                 $.ajax({
@@ -280,6 +283,218 @@
         }
     });    
 </script>
+
+<!---TOGGLE PLACE ORDER BUTTON FOR COD & RAZORPAY--->
+<script>
+    function toggleButtons() {
+        var codRadio = document.getElementById("cod");
+        var razorpayRadio = document.getElementById("razorpay");        
+        var placeOrderButton = document.getElementById("placeOrderButton");
+        var razorpayButton = document.getElementById("rzp-button1");
+      
+        if (razorpayRadio.checked) {
+          placeOrderButton.style.display = "none";
+          razorpayButton.style.display = "block";
+        } 
+        else {
+          placeOrderButton.style.display = "block";
+          razorpayButton.style.display = "none";
+        }
+      }
+</script>
+
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+    function saveOrder() {
+        event.preventDefault();        
+        // Get input field values
+        var addressee = document.getElementById('addressee').value;
+        var address_line1 = document.getElementById('address_line1').value;
+        var address_street = document.getElementById('address_street').value;
+        var city = document.getElementById('city').value;
+        var state = document.getElementById('state').value;
+        var country = document.getElementById('country').value;
+        var zip_code = document.getElementById('zip_code').value;
+        var payment_method = document.getElementById('razorpay').value;
+        var sub_total = document.getElementById('sub_total').value;
+        var discount_amount = document.getElementById('discount_amount').value;
+        var shipment_cost = document.getElementById('shipment_cost').value;
+        
+        // Create an object to store the data
+        var orderData = {
+            addressee: addressee,
+            address_line1: address_line1,
+            address_street: address_street,
+            city: city,
+            state: state,
+            country: country,
+            zip_code: zip_code,
+            payment_method: payment_method,
+            sub_total: sub_total,
+            discount_amount: discount_amount,
+            shipment_cost: shipment_cost
+        };
+
+        // Make an AJAX POST request to save the data
+        $.ajax({
+            type: "POST",
+            url: "/initiate-payment/", // Replace with the actual URL of your Django view to save the order
+            headers: { "X-CSRFToken": "{{ csrf_token }}" }, // Add this line to include the CSRF token
+            data: orderData,
+            dataType: 'json',
+            success: function(response) {
+                // Handle the success response (if needed)
+                console.log("Order data saved successfully!");
+                // After saving, trigger the Razorpay payment flow
+                initiateRazorpayPayment(response);
+            },
+            error: function(xhr, status, error) {
+                // Handle the error if any
+                console.log(xhr.responseText);
+                try {
+                    var alert_msg = JSON.parse(xhr.responseText);
+                    alert(alert_msg.error);                    
+                } catch (e) {
+                    alert("An error occurred. Please try again.");
+                }
+                //alert("Error saving order data. Please try again.");
+            }
+        });
+    }
+
+    function initiateRazorpayPayment(response) {        
+        console.log("Initiated Razorpay!");
+        var options = {
+            "key": response.key, // Use the key from the response data
+            "amount": response.amount,
+            "currency": response.currency,
+            "name": "Skin & Scent",
+            "description": "Test Transaction",
+            "image": "https://example.com/your_logo",
+            "order_id": response.order_id, // Use the order_id from the response data
+            "handler": function (response) {
+                //alert(response.razorpay_payment_id);
+                //alert(response.razorpay_order_id);
+                //alert(response.razorpay_signature);
+                handlePaymentSuccess(response)
+            },
+            "prefill": {
+                "name": "Gaurav Kumar",
+                "email": "gaurav.kumar@example.com",
+                "contact": "9000090000"
+            },
+            "notes": {
+                "address": "Razorpay Corporate Office"
+            },
+            "theme": {
+                "color": "#3399cc"
+            }
+        };
+    
+        var rzp1 = new Razorpay(options);
+        rzp1.on('payment.failed', function (response) {
+            alert(response.error.code);
+            alert(response.error.description);
+            alert(response.error.source);
+            alert(response.error.step);
+            alert(response.error.reason);
+            alert(response.error.metadata.order_id);
+            alert(response.error.metadata.payment_id);
+        });
+    
+        rzp1.open();
+    }
+
+    function handlePaymentSuccess(response) {
+        console.log("Initiated handlePaymentSuccess!");
+        // Extract the required data from the response
+        var payment_id = response.razorpay_payment_id;
+        var order_id = response.razorpay_order_id;
+        var signature = response.razorpay_signature;
+    
+        // Prepare the data to be sent in the POST request
+        var postData = {
+            razorpay_payment_id: payment_id,
+            razorpay_order_id: order_id,
+            razorpay_signature: signature
+        };
+    
+        // Make a POST request to the Django view using jQuery
+        $.ajax({
+            type: "POST",
+            url: "/handle-payment-success/", // Replace with the URL of your Django view
+            headers: { "X-CSRFToken": "{{ csrf_token }}" }, // Add this line to include the CSRF token
+            data: postData,
+            dataType: "json",
+            success: function (response) {
+                // Handle the response from the Django view (if needed)
+                if (response.status === "success") {
+                    // Payment success action on the client-side (e.g., show success message, redirect to a thank-you page)
+                    var order_id = response.order_id;
+                    window.location.href = "/order_success/"+ order_id + "/";
+                    //window.location.href = "/order_success/${order_id}/";
+                    console.log("Payment successful! Placed Order successfully!");
+                } else {
+                    console.log("Payment processing error:", response.message);
+                }
+            },
+            error: function (xhr, status, error) {
+                // Handle the error if any
+                console.log("Error:", xhr.responseText);
+            }
+        });
+    }
+</script>
+
+    
+
+
+
+<script>
+var options = {
+    "key": "{{ key_id }}", // Enter the Key ID generated from the Dashboard
+    "amount": "{{ amount }}", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+    "currency": "INR",
+    "name": "Acme Corp",
+    "description": "Test Transaction",
+    "image": "https://example.com/your_logo",
+    "order_id": "{{ order_id }}", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+    "handler": function (response){
+        alert(response.razorpay_payment_id);
+        alert(response.razorpay_order_id);
+        alert(response.razorpay_signature)
+    },
+    "prefill": {
+        "name": "Gaurav Kumar",
+        "email": "gaurav.kumar@example.com",
+        "contact": "9000090000"
+    },
+    "notes": {
+        "address": "Razorpay Corporate Office"
+    },
+    "theme": {
+        "color": "#3399cc"
+    }
+};
+var rzp1 = new Razorpay(options);
+rzp1.on('payment.failed', function (response){
+        alert(response.error.code);
+        alert(response.error.description);
+        alert(response.error.source);
+        alert(response.error.step);
+        alert(response.error.reason);
+        alert(response.error.metadata.order_id);
+        alert(response.error.metadata.payment_id);
+});
+/*
+document.getElementById('rzp-button1').onclick = function(e){
+    rzp1.open();
+    e.preventDefault();
+}
+*/
+</script>  
 
 
 {% endblock content %} 

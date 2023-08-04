@@ -80,7 +80,8 @@
                 <div class="carousel-inner border">
                   {% for image in images_list %}
                   <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                    <img class="w-100 h-100" src="{{ image.image.url }}" alt="Image" onclick="changeMainImage(this.src)" onmousemove="zoomImage(event, this)">
+                    <img class="w-100 h-100" src="{{ image.image.url }}" alt="Image" onmousemove="zoomImage(event, this)" onmouseleave="resetZoomedImage()">
+                    {% comment %} onclick="changeMainImage(this.src)" onmousemove="zoomImage(event, this)" {% endcomment %}
                   </div>                
                   {% endfor %}                
                 </div>
@@ -118,9 +119,21 @@
             <h3 class="font-weight-semi-bold mb-4">₹{{ variant_obj.0.price }}</h3>
             {% endif %} {% endcomment %}
             
-            {% if variant_obj %}
+            {% comment %} {% if variant_obj %}
+              {% if product_has_offer %}
+              <h3 class="font-weight-semi-bold mb-4">₹<span id="strike-price"><del>{{ variant_obj.0.price }}</del> {{discount_percent}}% Off</span></h3>
+              <h3 class="font-weight-semi-bold mb-4">₹<span id="new-price">{{ variant_obj.0.price }}</span></h3>              
+              {% else %}
               <h3 class="font-weight-semi-bold mb-4">₹<span id="selected-price">{{ variant_obj.0.price }}</span></h3>              
+              {% endif %}
+            {% endif %} {% endcomment %}
+            
+            {% if product_has_offer %}
+            {% comment %} <h3 class="font-weight-semi-bold mb-4">₹<span id="strike-price"><del>{{ variant_obj.0.price }}</del></span> {{discount_percent}}% Off</h3> {% endcomment %}
+            <h3 class="font-weight-semi-bold mb-4"><span id="strike-price"></span></h3>
             {% endif %}
+            {% comment %} <h3 class="font-weight-semi-bold mb-4">₹<span id="selected-price">{{ variant_obj.0.price }}</span></h3> {% endcomment %}
+            <h3 class="font-weight-semi-bold mb-4"><span id="selected-price"></span></h3>
             
             <p class="mb-4 short-description">{{ product_obj.description }}</p>
                         
@@ -131,7 +144,10 @@
                 {% csrf_token %}
                 {% for variant in variant_obj %}
                   <div class="custom-control custom-radio custom-control-inline">
-                    <input type="radio" class="custom-control-input" id="size-{{ variant.variant_value }}" name="size" value="{{ variant.id }}" {% if forloop.first %}checked{% endif %}>
+                    {% comment %} <input type="radio" class="custom-control-input" id="size-{{ variant.variant_value }}" name="size" value="{{ variant.id }}" required> {% endcomment %}
+                    
+                    <input type="radio" class="custom-control-input" id="size-{{ variant.variant_value }}" name="size" value="{{ variant.id }}" data-variant-price="{{ variant.price }}" data-variant-quantity="{{ variant.quantity }}" required>
+
                     <label class="custom-control-label" for="size-{{ variant.variant_value }}">{{ variant.variant_value }} {{ unit }}</label>
                     <span class="price" data-variant-price="{{ variant.price }}"></span>
                     <span class="quantity" data-variant-quantity="{{ variant.quantity }}"></span>
@@ -171,16 +187,25 @@
                     </div>
                   </div>
                 </div> {% endcomment %}
-                <div class="mt-3">
-                  {% if username is None %}
-                    <a href="/cart_signin/{{ product_obj.pk }}/" class="btn btn-primary px-3">
-                      <i class="fa fa-shopping-cart mr-1"></i> Signin & Add To Cart
-                    </a>
-                  {% else %}
-                    <button type="submit" class="btn btn-primary px-3">
-                      <i class="fa fa-shopping-cart mr-1"></i> Add To Cart
-                    </button>
-                  {% endif %}
+                <div class="mt-3">                  
+                    {% if username is None %}
+                      <a href="/cart_signin/{{ product_obj.pk }}/" class="btn btn-primary px-3">
+                        <i class="fa fa-shopping-cart mr-1"></i> Signin & Add To Cart
+                      </a>
+                    {% else %}
+                      {% comment %} <button type="submit" class="btn btn-primary px-3">
+                        <i class="fa fa-shopping-cart mr-1"></i> Add To Cart
+                      </button> {% endcomment %}
+                        <!-- Add to Cart button when product is in stock -->
+                        <button type="submit" id="addToCartBtn" class="btn btn-primary px-3">
+                          <i class="fa fa-shopping-cart mr-1"></i> Add To Cart
+                        </button>
+                        <!-- Out of Stock button when product is not in stock -->
+                        <button id="outOfStockBtn" class="btn btn-danger px-3" style="display: none;">
+                          Out Of Stock
+                        </button>
+                    {% endif %}
+                  
                 </div>
               </form>
             </div>
@@ -374,4 +399,74 @@
     // Place your other JavaScript code here
   };
 </script>
+
+<!---RADIO BUTTON-->
+<!-- Include jQuery library -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+  $(document).ready(function() {
+      $('input[type="radio"]').on('change', function() {
+          var selectedPrice = parseFloat($(this).data('variant-price'));
+          var selectedQuantity = $(this).data('variant-quantity');
+          var selectedValue = $(this).val();
+  
+          $('#selected-price').text(selectedPrice);
+          $('#selected-quantity').text(selectedQuantity);
+          //$('#selected-value2').text(selectedValue);
+          //$('#selected-price2').text(selectedPrice);
+
+          updateAddToCartButton(selectedQuantity);
+  
+          // Check if there is a discount percentage to display the strike-through price.
+          var discountPercent = '{{ discount_percent }}';
+          if (discountPercent) {
+              var strikePrice = parseFloat(selectedPrice);
+              var discountAmount = strikePrice * parseFloat(discountPercent) / 100;
+              var discountedPrice = strikePrice - discountAmount;
+              $('#strike-price').html('₹' + '<del>' + strikePrice.toFixed(2) + '</del> ' + discountPercent + '% Off' );
+              $('#selected-price').html('₹' + discountedPrice.toFixed(2));
+          } else {
+              // If there is no discount, remove the strike-through price.
+              //$('#strike-price').html('');
+              $('#selected-price').html('₹' + selectedPrice.toFixed(2));
+          }
+  
+          // Storing variables
+          var VariantStock = selectedQuantity;
+          var selectedVariantValue = selectedValue;
+          var selectedVariantPrice = selectedPrice;
+  
+          // Perform any additional actions based on the selected variant.
+          // For example, you can update the Add to Cart form action with the selected variant ID.
+          //$('#add-to-cart-form').attr('action', '/add_to_cart/' + selectedVariantValue + '/');
+      });
+
+      // Function to show/hide the appropriate button based on selectedQuantity
+      function updateAddToCartButton(selectedQuantity) {
+        if (selectedQuantity === 0) {
+          $('#addToCartBtn').hide();
+          $('#outOfStockBtn').show();
+        } else {
+          $('#addToCartBtn').show();
+          $('#outOfStockBtn').hide();
+        }
+      }
+
+
+
+      var discountPercent = '{{ discount_percent }}';
+          if (discountPercent) {
+            $('#selected-price').html('');
+          }
+        
+
+  });
+
+  // When the user clicks the "Out Of Stock" button, prevent form submission
+  $('#outOfStockBtn').on('click', function(event) {
+    event.preventDefault();
+  });
+  </script>
+
 {% endblock content %}

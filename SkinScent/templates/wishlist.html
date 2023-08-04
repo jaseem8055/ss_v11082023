@@ -1,0 +1,97 @@
+{% extends 'base3.html' %}
+
+
+{% block content %}
+
+    <!---BASE 3-->
+
+    <!-- Page Header Start -->
+    <div class="container-fluid bg-secondary mb-5">
+        <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 100px">
+            <h1 class="font-weight-semi-bold text-uppercase mb-3">Wishlist</h1>
+            <div class="d-inline-flex">
+                <p class="m-0"><a href="/">Home</a></p>
+                <p class="m-0 px-2">-</p>
+                <p class="m-0">Wishlist</p>
+            </div>
+        </div>
+    </div>
+    <!-- Page Header End -->
+
+        <!-- Shop Start -->
+        <div class="container-fluid pt-5">
+            <div class="row px-xl-5">
+                    
+                <!-- Shop Product Start -->
+                <div class="col-lg-9 col-md-12">
+                    <div class="row pb-3">                        
+                        <!--IMAGE CARD-->
+                        {% comment %} {% for product in products %} {% endcomment %}
+                        {% comment %} {% for image in product.images.all %} {% endcomment %}
+                        {% for image in images %}
+                        <div class="col-lg-4 col-md-6 col-sm-12 pb-1">                        
+                            <div class="card product-item border-0 mb-4">
+                                <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
+                                    <img class="img-fluid w-100" src="{{ image.image.url }}" alt="">
+                                </div>
+                                <div class="card-body border-left border-right text-center p-0 pt-4 pb-3">
+                                    <h6 class="text-truncate mb-3">{{ image.product.name }}</h6>
+                                    {% with variant as image.product.productvariant_set.first %}
+                                    {% if variant %}                                
+                                    <div class="d-flex justify-content-center">
+                                        <h6>₹{{ variant.0.price }}</h6><h6 class="text-muted ml-2"><del>₹</del></h6>
+                                    </div>
+                                    {% endif %}
+                                    {% endwith %}
+                                </div>
+                                <div class="card-footer d-flex justify-content-between bg-light border">
+                                    {% comment %} {% with product_id=image.product.id %} {% endcomment %}
+                                    <!-- Access the product_id here -->
+                                    <a href="/product_detail/{{ image.product.product_id }}/" class="btn btn-sm text-dark p-0"><i class="fas fa-eye text-primary mr-1"></i>View Detail</a>                                
+                                    {% comment %} {% endwith %} {% endcomment %}
+                                    <form action="">
+                                        {% csrf_token %}
+                                        <a href="/remove_from_wishlist/{{ image.product.product_id }}/" class="btn btn-sm text-dark p-0" onclick="">Remove from Wishlist</a>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% comment %} {% endfor %}                     {% endcomment %}
+                        <!--IMAGE CARD-->
+                        
+                         <!--PAGINATOR-->
+                         <div class="col-12 pb-1">
+                            <nav aria-label="Product pagination">
+                                <ul class="pagination justify-content-center">
+                                  {% if images.has_previous %}
+                                  <li class="page-item">
+                                    <a class="page-link" href="?page={{ images.previous_page_number }}">Previous</a>
+                                  </li>
+                                  {% endif %}
+                                  
+                                  {% for num in images.paginator.page_range %}
+                                  <li class="page-item {% if num == images.number %}active{% endif %}">
+                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                  </li>
+                                  {% endfor %}
+                                  
+                                  {% if images.has_next %}
+                                  <li class="page-item">
+                                    <a class="page-link" href="?page={{ images.next_page_number }}">Next</a>
+                                  </li>
+                                  {% endif %}
+                                </ul>
+                            </nav>
+                        </div>
+                        <!--PAGINATOR-->
+    
+                    </div>
+                </div>
+                <!-- Shop Product End -->
+            </div>
+        </div>
+        <!-- Shop End -->
+    
+        <!---BASE 3-->   
+{% endblock content %}

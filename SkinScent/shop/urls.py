@@ -20,6 +20,31 @@ urlpatterns = [
     path('checkout/', views.checkout, name='checkout'),
     path('create_order/', views.create_order, name='create_order'),
     path('order_success/<int:order_id>/', views.order_success, name='order_success'),
-    path('get-address/', views.get_address, name="get_address")
+    path('get-address/', views.get_address, name="get_address"),
+
+    # Razor Pay
+    path('initiate-payment/', views.initiate_payment, name='initiate_payment'),
+    path('handle-payment-success/', views.handle_payment_success, name='handle_payment_success'),    
+
+    # Search Options
+    path('search-products/', views.search_products, name='search_products'),
+    path('filter-products/', views.filter_products, name='filter_products'),
+    path('process-filter/', views.process_filter, name='process_filter'),
+
+    # Coupon Management
+    path('apply-coupon/', views.apply_coupon, name='apply_coupon'),
+    path('clear-coupon/', views.clear_coupon, name='clear_coupon'),
+
+    # PDF Exporting
+    path('download-pdf/<int:order_id>/', views.generate_pdf, name='download_pdf'),
+
+    # Wishlist
+    path('add_to_wishlist/<int:product_id>/', views.add_to_wishlist, name='add_to_wishlist'),
+    path('wishlist/', views.wishlist_products, name='wishlist_products'),
+    path('remove_from_wishlist/<int:product_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),
+
+    # Offers
+    path('offers/', views.offer_page, name='offer_page'),
+
 
 ]

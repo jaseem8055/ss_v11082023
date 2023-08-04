@@ -1,0 +1,78 @@
+{% extends 'adminpanel/a_base1.html' %}
+
+{% block content %}  
+
+  <!---NEW-->
+  
+  <div class="container p-3">    
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <h6>Existing Offers</h6>
+        <ul class="list-group">
+          {% if  not existing_offers %}
+          <li class="list-group-item">No Data to Display</li>
+          {% endif %}
+          {% for offer in existing_offers %}
+            <li class="list-group-item"><strong>{{ offer.name }}-ID#{{offer.id}}</strong> - {{ offer.start_date }} to {{ offer.end_date }}</li>
+            <a href="/adminpanel/offers/edit/{{offer.id}}" class="btn btn-sm btn-secondary">Edit</a>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <h6>Upcoming Offers</h6>
+        <ul class="list-group">
+          {% if  not upcoming_offers %}
+          <li class="list-group-item">No Data to Display</li>
+          {% endif %}
+          {% for offer in upcoming_offers %}
+            <li class="list-group-item"><strong>{{ offer.name }}-ID#{{offer.id}}</strong> - {{ offer.start_date }} to {{ offer.end_date }}</li>
+            <a href="/adminpanel/offers/edit/{{offer.id}}" class="btn btn-sm btn-secondary">Edit</a>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <h6>Expired Offers</h6>
+        <ul class="list-group">
+          {% if  not expired_offers %}
+          <li class="list-group-item">No Data to Display</li>
+          {% endif %}
+          {% for offer in expired_offers %}
+            <li class="list-group-item"><strong>{{ offer.name }}-ID#{{offer.id}}</strong> - {{ offer.start_date }} to {{ offer.end_date }}</li>
+            <a href="/adminpanel/offers/edit/{{offer.id}}" class="btn btn-sm btn-secondary">Edit</a>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <h6>Deactivated Offers</h6>
+        <ul class="list-group">
+          {% if  not deactivated_offers %}
+          <li class="list-group-item">No Data to Display</li>
+          {% endif %}
+          {% for offer in deactivated_offers %}
+            <li class="list-group-item"><strong>{{ offer.name }}-ID#{{offer.id}}</strong> to {{ offer.end_date }}</li>
+            <a href="/adminpanel/offers/edit/{{offer.id}}" class="btn btn-sm btn-secondary">Edit</a>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  
+    <a href="/adminpanel/offers/create/" class="btn btn-primary mt-3">Add New Offer</a>
+  </div>
+ 
+  
+
+
+
+
+
+
+{% endblock content %} 

@@ -1,0 +1,136 @@
+{% extends 'adminpanel/a_base1.html' %}
+
+{% block content %}  
+    <form method="post" id="productOfferForm" action="{% url 'adminpanel:edit_product_offer' product_offer.pk %}">
+        {% csrf_token %}
+        <!-- Display existing data in the form fields -->
+        <div class="form-group">
+            <label for="offer">Offer Title:</label>
+            <select name="offer" id="offer" class="form-control" required>
+                <option value="">Select One</option>
+                {% for offer in offers %}
+                <option value="{{ offer.pk }}" data-start-date="{{ offer.start_date }}" data-end-date="{{ offer.end_date }}" {% if offer.pk == product_offer.offer.pk %}selected{% endif %}>
+                    {{ offer.name }} ({{ offer.start_date }} to {{ offer.end_date|default:"Ongoing" }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+    
+        <div class="form-group">
+            <label for="product">Product:</label>
+            <select name="product" id="product" class="form-control" required>
+                <option value="">Choose Product</option>
+                {% for product in products %}
+                <option value="{{ product.pk }}" {% if product.pk == product_offer.product.product_id %}selected{% endif %}>{{ product.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        {% if error_message %}
+            <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+                {{ error_message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endif %}
+
+
+        <div class="form-group">
+            <label for="discount_percentage">Discount Percentage:</label>
+            <input type="number" id="discount_percentage" name="discount_percentage" class="form-control" value="{{ product_offer.discount_percentage }}" required>
+            <!-- Display an error message for invalid input -->
+            <small class="error-message" id="discountPercentageError"></small>
+        </div>
+
+        <div class="form-group">
+            <label for="start_date">Start Date:</label>
+            <input type="datetime-local" id="start_date" name="start_date" class="form-control" value="{{ product_offer.start_date|date:'Y-m-d\TH:i' }}" required>
+            <!-- Display an error message for invalid input -->
+            <small class="error-message" id="startDateError"></small>
+        </div>
+
+        <div class="form-group">
+            <label for="end_date">End Date:</label>
+            <input type="datetime-local" id="end_date" name="end_date" class="form-control" value="{{ product_offer.end_date|date:'Y-m-d\TH:i' }}" required>
+            <!-- Display an error message for invalid input -->
+            <small class="error-message" id="endDateError"></small>
+        </div>
+
+        <div class="form-group">
+            <label for="active">Active:</label>
+            <input type="checkbox" id="active" name="active" {% if product_offer.active %}checked{% endif %}>
+        </div>
+
+        {% if error_message %}
+        <p class="error-message">{{ error_message }}</p>
+        {% endif %}
+
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        ||<a href="/adminpanel/offers/product/"><span>Go Back</span></a>
+    </form>
+
+    <!--client-side validation of Form using JavaScript-->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const productOfferForm = document.getElementById("productOfferForm");
+            const discountPercentageInput = document.getElementById("discount_percentage");
+            const startDateInput = document.getElementById("start_date");
+            const endDateInput = document.getElementById("end_date");
+    
+            productOfferForm.addEventListener("submit", function (event) {
+                if (!validateDiscountPercentage()) {
+                    event.preventDefault();
+                }
+                if (!validateStartDate()) {
+                    event.preventDefault();
+                }
+                if (!validateEndDate()) {
+                    event.preventDefault();
+                }
+            });
+    
+            function validateDiscountPercentage() {
+                const discountPercentageError = document.getElementById("discountPercentageError");
+                const discountPercentage = parseInt(discountPercentageInput.value);
+                if (isNaN(discountPercentage) || discountPercentage < 1) {
+                    discountPercentageError.textContent = "Discount percentage must be a positive integer.";
+                    return false;
+                }
+                discountPercentageError.textContent = "";
+                return true;
+            }
+    
+            function validateStartDate() {
+                const startDateError = document.getElementById("startDateError");
+                const startDate = new Date(startDateInput.value);
+                const currentDate = new Date();
+                if (isNaN(startDate.getTime()) || startDate < currentDate) {
+                    startDateError.textContent = "Start date must be a future date.";
+                    return false;
+                }
+                startDateError.textContent = "";
+                return true;
+            }
+    
+            function validateEndDate() {
+                const endDateError = document.getElementById("endDateError");
+                const endDate = new Date(endDateInput.value);
+                const startDate = new Date(startDateInput.value);
+                if (isNaN(endDate.getTime()) || endDate <= startDate) {
+                    endDateError.textContent = "End date must be after the start date.";
+                    return false;
+                }
+                endDateError.textContent = "";
+                return true;
+            }
+        });
+    </script>
+  
+  <!---client-side validation--->
+  <style>
+    .error-message {
+        color: red;
+    }
+  </style>
+{% endblock content %} 

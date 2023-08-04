@@ -4,58 +4,66 @@
 {% block content %} 
                      
   <h2>Category Management</h2>
-  <form id="addCategory" method="post" class="mt-4" action="/adminpanel/add_cat/">
+  <form id="addCategory" method="post" class="mt-4" action="/adminpanel/add_cat/" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="mb-3">
       <label for="category_name" class="form-label">Category Name:</label>
-      <input type="text" name="category_name" id="category_name" class="form-control" required>
-      {% comment %} <div class="invalid-feedback">Please enter the category name.</div> {% endcomment %}
+      <input type="text" name="category_name" id="category_name" class="form-control" required>      
     </div>
+
+    {% if error_message %}
+        <div class="mb-3 alert alert-danger alert-dismissible fade show" role="alert">                            
+            {{ error_message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endif %}
     
     <div class="mb-3">
       <label for="slug_name" class="form-label">Slug Name:</label>
-      <input type="text" name="slug_name" id="slug_name" class="form-control" readonly placeholder="auto-generated">
-      {% comment %} <div class="invalid-feedback">Please enter the slug name.</div> {% endcomment %}
+      <input type="text" name="slug_name" id="slug_name" class="form-control" readonly placeholder="auto-generated">      
     </div>
     
-    {% comment %} <div class="mb-3">
-      <label for="parent" class="form-label">Parent:</label>
-      <select name="parent" id="parent" class="form-select">
-        <option value="">None</option>
-        <!-- Add options dynamically based on available categories -->
-      </select>
-    </div> {% endcomment %}
     
     <div class="mb-3">
       <label for="description" class="form-label">Description:</label>
-      <textarea name="description" id="description" class="form-control" required></textarea>
-      {% comment %} <div class="invalid-feedback">Please enter the description.</div> {% endcomment %}
+      <textarea name="description" id="description" class="form-control" required></textarea>    
     </div>
     
-    {% comment %} <div class="mb-3">
-      <label for="images" class="form-label">Images:</label>
-      <input type="file" name="images" id="images" class="form-control" multiple>
-    </div> {% endcomment %}
+    <div class="mb-3">
+      <label for="category_image" class="form-label">Category Image:</label>
+      <input type="file" name="category_image" id="category_image" class="form-control">      
+    </div>
+    <div class="mb-3" id="image-preview">
+      <!-- Display the selected image here -->
+    </div>    
+    
     
     <button type="submit" class="btn btn-primary">Save</button><span>||</span><a href="/adminpanel/list_cat/">Cancel</a>
   </form>
   
-  {% comment %} <script>
-    // Add Bootstrap validation styles to the form
-    (function () {
-      'use strict';
-      var forms = document.querySelectorAll('.needs-validation');
-      Array.prototype.slice.call(forms).forEach(function (form) {
-        form.addEventListener('submit', function (event) {
-          if (!form.checkValidity()) {
-            event.preventDefault();
-            event.stopPropagation();
-          }
-          form.classList.add('was-validated');
-        }, false);
-      });
-    })();
-  </script> {% endcomment %}
+  
+  <script>
+    // JavaScript code to handle image preview
+    document.getElementById("category_image").addEventListener("change", function(event) {
+      const previewDiv = document.getElementById("image-preview");
+      previewDiv.innerHTML = ""; // Clear previous preview
+
+      const file = event.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function(event) {
+        const img = document.createElement("img");
+        img.src = event.target.result;
+        //img.className = "img-fluid mt-2";
+        img.className = "preview-image";
+        previewDiv.appendChild(img);
+      };
+
+      reader.readAsDataURL(file);
+    });
+  </script>
 
 
 {% endblock content %} 

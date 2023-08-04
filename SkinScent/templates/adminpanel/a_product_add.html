@@ -12,6 +12,14 @@
         <label for="product-name" class="form-label">Product Name</label>
         <input type="text" class="form-control" id="product-name" name="name" required>
       </div>
+      {% if error_message %}
+        <div class="mb-3 alert alert-danger alert-dismissible fade show" role="alert">                            
+            {{ error_message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        {% endif %} 
       <div class="mb-3">
         <label for="product-category" class="form-label">Category</label>
         <select class="form-select" id="product-category" name="category" required>
@@ -46,7 +54,7 @@
         <label for="product-images" class="form-label">Images</label>
         {% comment %} <input type="file" class="form-control" id="product-images" name="images" accept="image/*" multiple> {% endcomment %}
 
-        <input type="file" class="form-control" id="product-images" name="images" accept="image/*" multiple onchange="previewImages(event)">
+        <input type="file" class="form-control" id="product-images" name="images" accept="image/*" multiple onchange="previewImages(event)" required>
         <div id="image-preview-container"></div>
       </div>
 

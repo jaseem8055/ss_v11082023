@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Product Offers</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .offer-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 5px;
+        }
+        .product-offer {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            background-color: #f9f9f9;
+        }
+        .product-name {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .offer-details {
+            font-size: 16px;
+            color: #888;
+            margin-top: 5px;
+        }
+        .discount {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ff0000;
+        }
+        .expired {
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <h1>Product Offers</h1>
+
+    {% for offer, product_offers in offer_dict.items %}
+        <div class="offer-title">{{ offer.name }}</div>
+        {% for data in product_offers %}
+            {% with product_offer=data.product_offer first_image=data.first_image %}
+                <div class="product-offer">
+                    <div class="product-name">{{ product_offer.product.name }}</div>
+                    {% if first_image %}
+                        <img src="{{ first_image.image.url }}" alt="{{ product_offer.product.name }}" width="200">
+                    {% else %}
+                        <p>No Image Available</p>
+                    {% endif %}
+                    <div class="offer-details">
+                        Valid from: {{ product_offer.start_date|date:"Y-m-d" }} to {{ product_offer.end_date|date:"Y-m-d" }}
+                    </div>
+                    <div class="discount">
+                        {{ product_offer.discount_percentage }}% Discount
+                    </div>
+                    {% if product_offer.active %}
+                        <div class="active">Active</div>
+                    {% else %}
+                        <div class="expired">Expired</div>
+                    {% endif %}
+                </div>
+            {% endwith %}
+        {% endfor %}
+    {% endfor %}
+</body>
+</html>

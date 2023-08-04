@@ -25,3 +25,11 @@ class DefaultAddress(models.Model):
 class ContactMobile(models.Model):
     user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     mobile_number = models.CharField(max_length=20)
+
+class Wallet(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    
+
+    def __str__(self):
+        return f"Wallet for {self.user.username}"

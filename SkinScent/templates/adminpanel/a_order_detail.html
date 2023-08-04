@@ -1,56 +1,83 @@
 {% extends 'adminpanel/a_base1.html' %}
 
 {% block content %}
-<h3>Order Detail</h3>
-<br>
-<h6>Order Number:</h6>
-<p>{{ order.order_number }}</p>
-<br>
-<h6>Ordered by:</h6>
-<p>Username: {{ order.user.username }}</p>
-<p>Email: {{ order.user.email }}</p>
-<br>
-<h6>Order Summary:</h6>
-<p>Total Bill: {{ order.get_cart_total }}</p>
-<p>Payment Status: {{ order.payment_status }} ||<span><a href=""> change status</a></span></p>
-<p>Payment Method: {{ order.payment_method }}</p>
-<p>Delivery Status: {{ order.fulfillment_status }}</p>
+<div class="container py-3">
+    <h3>Order Detail</h3>
+    <br>
+    <h6>Order Number:</h6>
+    <p>{{ order.order_number }}</p>
+    <br>
+    <h6>Ordered by:</h6>
+    <p>Username: {{ order.user.username }}</p>
+    <p>Email: {{ order.user.email }}</p>
+    <br>
 
-<h6>Order Items</h6>
-<table class="table">
-  <thead>
-    <tr>
-        <th>Product</th>
-        <th>Variant</th>
-        <th>Quantity</th>
-        <th>Price</th>
-    </tr>
-</thead>
-<tbody>
-    
-    {% for order_item in order.orderitem_set.all %}
-    <tr>
-        <td>{{ order_item.product.name }}</td>
-        <td>{{ order_item.variant.variant_value }}{{ order_item.variant.product.unit_of_measurement.unit }}</td>
-        <td>{{ order_item.quantity }}</td>
-        <td>{{ order_item.price }}</td>
-    </tr>    
-    {% endfor %}
-    <tr>
-        <td> </td>
-        <td> </td>
-        <td>Shipment Cost :</td>
-        <td>{{ order.shipment_cost }}</td>
-    </tr>
-    <tr>
-        <td> </td>
-        <td> </td>
-        <td>Total Bill:</td>
-        <td>{{ order.get_cart_total }}</td>
-    </tr>
-    
-  </tbody>
-</table>
+    <h6>Order Summary:</h6>
+    <p><strong>Order Date: </strong> {{ order.created_at }}</p>
+    <p><strong>Total Bill: </strong> {{ order.get_cart_total }}</p>
+    <p><strong>Payment Status:</strong> <span class="bordered">{{ order.payment_status }}</span> ||<span><a href="/adminpanel/change-payment-status/{{order.pk}}"> change status</a></span></p>
+    <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
+    <p><strong>Delivery Status:</strong> <span class="bordered">{{ order.fulfillment_status }}</span>||<span><a href="/adminpanel/change-delivery-status/{{order.pk}}"> change status</a></span></p></p>  
+
+    <br>
+    <h6>Order Items</h6>
+    <table class="table">
+      <thead>
+        <tr>
+            <th>Product</th>
+            <th>Variant</th>
+            <th>Quantity</th>
+            <th>Price</th>
+        </tr>
+    </thead>
+    <tbody>
+        
+        {% for order_item in order.orderitem_set.all %}
+        <tr>
+            <td>{{ order_item.product.name }}</td>
+            <td>{{ order_item.variant.variant_value }}{{ order_item.variant.product.unit_of_measurement.unit }}</td>
+            <td>{{ order_item.quantity }}</td>
+            <td>{{ order_item.price }}</td>
+        </tr>    
+        {% endfor %}
+        <tr>
+            <td> </td>
+            <td> </td>
+            <td>Shipment Cost :</td>
+            <td>{{ order.shipment_cost }}</td>
+        </tr>
+        <tr>
+            <td> </td>
+            <td> </td>
+            <td>Total Bill:</td>
+            <td>{{ order.get_cart_total }}</td>
+        </tr>
+        
+      </tbody>
+    </table>
+</div>
+
+<style>
+    .order-details {
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin-bottom: 20px;
+    }
+
+    .order-details h6 {
+        margin-bottom: 5px;
+    }
+
+    .bordered {
+        border: 1px solid #ddd;
+        padding: 5px;
+        display: inline-block;
+    }
+
+    .change-status-link {
+        margin-top: 5px;
+    }
+</style>
 
 <!-- Add more order details as needed -->
 {% endblock %}

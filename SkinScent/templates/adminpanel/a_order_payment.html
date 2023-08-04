@@ -1,0 +1,41 @@
+{% extends 'adminpanel/a_base1.html' %}
+
+{% block content %}
+
+<div class="container py-3">
+    <h3>Order Detail</h3>
+    <br>
+    <h6>Order Number:</h6>
+    <p>{{ order.order_number }}</p>
+    <!-- Display other order details from the 'Order' model here if needed -->
+    
+    {% if razor_payment %}
+        <h6>Razor Payment Details</h6>
+        <p>Razorpay Order ID: {{ razor_payment.razorpay_order_id }}</p>
+        <p>Razorpay Payment ID: {{ razor_payment.razorpay_payment_id }}</p>
+        <p>Razorpay Signature: {{ razor_payment.razorpay_signature }}</p>    
+    {% else %}
+        <h6>COD Payment Details</h6>
+        <p>COD Order ID: COD-DDMMYY-SERIAL </p>
+        <p>COD Payment ID: PAY-COD-DDMMYY-SERIAL </p>
+        <p>Received by: Agent Name </p>
+    {% endif %}
+    
+    
+    <h3>Change Payment Status</h3>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="paymentStatus" class="form-label">Payment Status:</label>
+            <select id="paymentStatus" name="payment_status" class="form-select">
+                <option value="Pending" {% if order.payment_status == 'Pending' %}selected{% endif %}>Pending</option>
+                <option value="Paid" {% if order.payment_status == 'Paid' %}selected{% endif %}>Paid</option>
+                <option value="Failed" {% if order.payment_status == 'Failed' %}selected{% endif %}>Failed</option>
+                <!-- Add other payment status options as needed -->
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Update Payment Status</button>
+    </form>
+</div>
+
+{% endblock %}

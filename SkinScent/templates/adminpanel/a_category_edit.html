@@ -3,12 +3,21 @@
 {% block content %}
   <h2>Category Management</h2>
   {% comment %} <form id="editCategory" method="post" class="mt-4" action="{% url 'adminpanel:edit-cat' category.id %}"> {% endcomment %}
-  <form id="editCategory" method="post" class="mt-4" action="/adminpanel/edit_cat/{{category.id}}/">
+  <form id="editCategory" method="post" class="mt-4" action="/adminpanel/edit_cat/{{category.id}}/" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="mb-3">
       <label for="category_name" class="form-label">Category Name:</label>
-      <input type="text" name="category_name" id="category_name" class="form-control" value={{ category.name }} required>
+      <input type="text" name="category_name" id="category_name" class="form-control" value="{{ category.name }}" required>
     </div>
+
+    {% if error_message %}
+        <div class="mb-3 alert alert-danger alert-dismissible fade show" role="alert">                            
+            {{ error_message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endif %}
     
     <div class="mb-3">
       <label for="slug_name" class="form-label">Slug Name:</label>
@@ -18,8 +27,62 @@
     <div class="mb-3">
       <label for="description" class="form-label">Description:</label>
       <textarea name="description" id="description" class="form-control" required>{{ category.description }}</textarea>
-    </div>  
+    </div>
+    
+    <div class="container-fluid pt-5">
+      <h6>Images</h6>
+      <div class="row px-xl-5 pb-3">                      
+          <!--Image Card-->
+          <div class="col-lg-4 col-md-6 pb-1">
+              <div class="cat-item d-flex flex-column border mb-4" style="padding: 30px;">                    
+                  <a href="" class="cat-img position-relative overflow-hidden mb-3">                      
+                      <img class="img-fluid " src="{{ category.image.url }}" alt="">
+                  </a>                    
+              </div>
+          </div>          
+          <!--Image Card-->
+      </div>
+    </div> 
+
+    <div class="mb-3">
+      <label for="category_image" class="form-label">New Category Image:</label>
+      <input type="file" name="category_image" id="category_image" class="form-control">
+    </div>
+    <div class="mb-3" id="image-preview">
+      <!-- Display the selected image here -->
+    </div>
+    
+    {% comment %} <div class="mb-3">
+      <label for="new_category_image" class="form-label">Category Image:</label>
+      <input type="file" name="new_category_image" id="new_category_image" class="form-control">      
+    </div>
+    <div class="mb-3" id="image-preview">
+      <!-- Display the selected image here -->
+    </div>  {% endcomment %}
     
     <button type="submit" class="btn btn-primary">Save</button><span>||</span><a href="/adminpanel/list_cat/">Cancel</a>
   </form>
+
+
+  <script>
+    // JavaScript code to handle image preview
+    document.getElementById("category_image").addEventListener("change", function(event) {
+      const previewDiv = document.getElementById("image-preview");
+      previewDiv.innerHTML = ""; // Clear previous preview
+
+      const file = event.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function(event) {
+        const img = document.createElement("img");
+        img.src = event.target.result;
+        //img.className = "img-fluid mt-2";
+        img.className = "preview-image";
+        previewDiv.appendChild(img);
+      };
+
+      reader.readAsDataURL(file);
+    });
+  </script>
+
 {% endblock %}

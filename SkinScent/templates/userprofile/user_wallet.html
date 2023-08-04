@@ -1,0 +1,21 @@
+{% extends 'userprofile/user_base_1.html' %}
+{% block content %}
+
+<div class="container py-3">
+    <h2>My Wallet</h2>      
+        <div class="card mb=2">
+          <div class="card-body m-auto">
+            <p>Hello, {{ user.username }}! Your current wallet balance is <strong>₹{{ user_wallet.balance }}</strong></p>
+          </div>
+          <div class="card-footer">            
+            <h6>Personal Information</h6>
+              <p>Username: {{ user.username }}</p>
+              <p>Email: {{ user.email }}</p>      
+          </div>
+
+        </div><br>
+        
+        
+</div>    
+
+{% endblock content %}

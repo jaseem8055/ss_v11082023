@@ -15,6 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.http import HttpResponse
 from django.urls import path, include
 
 # from allauth.account.views import ConfirmEmailView
@@ -24,6 +25,9 @@ from authapp.views import CustomConfirmEmailView
 from django.conf import settings
 from django.conf.urls.static import static
 
+# Login Required
+from authapp.views import signin
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('shop.urls')),
@@ -31,6 +35,12 @@ urlpatterns = [
     path('accounts/confirm-email/<str:key>/', CustomConfirmEmailView.as_view(), name='account_confirm_email'),
     path('adminpanel/', include('adminpanel.urls')),
     path('userprofile/', include('userprofile.urls')),
+
+    # Login required url path
+    path('accounts/login/', signin, name='login'),
+
+    # Handle Favicon 404
+    path('favicon.ico', lambda request: HttpResponse(status=204)),
 ] 
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

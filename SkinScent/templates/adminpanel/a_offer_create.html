@@ -1,0 +1,38 @@
+{% extends 'adminpanel/a_base1.html' %}
+
+{% block content %}
+  <div class="container p-3">
+      <h4>Create New Offer</h4>
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="name" class="form-label">Name:</label>
+            <input type="text" id="name" name="name" class="form-control" required>
+            {% if error_message %}
+                <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+                    {{ error_message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            <label for="start_date" class="form-label">Start Date:</label>
+            <input type="datetime-local" id="start_date" name="start_date" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="end_date" class="form-label">End Date:</label>
+            <input type="datetime-local" id="end_date" name="end_date" class="form-control">
+        </div>
+        <div class="form-check mb-3">
+            <input type="checkbox" id="active" name="active" class="form-check-input" checked>
+            <label for="active" class="form-check-label">Active:</label>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Offer</button>
+        ||<a href="/adminpanel/offers/"><span>Go Back</span></a>
+    </form>
+    <!---CONTAINER END-->
+  </div>
+
+{% endblock content %} 

@@ -99,9 +99,9 @@
             <div class="col-lg-3 col-6 text-right">
                 <a href="" class="btn border">
                     <i class="fas fa-heart text-primary"></i>
-                    <span class="badge">0</span>
+                    <span class="badge">{{ wishlist_count }}</span>
                 </a>
-                <a href="" class="btn border">
+                <a href="/cart/" class="btn border">
                     <i class="fas fa-shopping-cart text-primary"></i>
                     <span class="badge">0</span>
                 </a>
@@ -120,16 +120,10 @@
             <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
                 <div class="navbar-nav mr-auto py-0">
                     <a href="/" class="nav-item nav-link active">Home</a>
-                    <a href="#" class="nav-item nav-link">Category</a>
-                    <a href="#" class="nav-item nav-link">Products</a>
-                    <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Orders</a>
-                        <div class="dropdown-menu rounded-0 m-0">
-                            <a href="#" class="dropdown-item">Order_1</a>
-                            <a href="#" class="dropdown-item">Order_2</a>
-                        </div>
-                    </div>
-                    <a href="#" class="nav-item nav-link">Costumers</a>
+                    <a href="/userprofile/verify-reset-pass/" class="nav-item nav-link">Change Password</a>
+                    <a href="/userprofile/list_address/" class="nav-item nav-link">Manage Address</a>
+                    <a href="/userprofile/my_orders/" class="nav-item nav-link">My Orders</a>
+                    <a href="/userprofile/my-wallet/" class="nav-item nav-link">My Wallet</a>
                 </div>
                 <div class="navbar-nav ml-auto py-0">                    
                     {% if username != None %}                    
@@ -159,8 +153,10 @@
                 <nav class="collapse show navbar navbar-vertical navbar-light align-items-start p-0 border border-top-0 border-bottom-0" id="navbar-vertical">
                     <div class="navbar-nav w-100 overflow-hidden" style="height: 410px">                       
                         <a href="/userprofile/" class="nav-item nav-link">My Profile</a>
+                        <a href="/userprofile/verify-reset-pass/" class="nav-item nav-link">Change Password</a>
                         <a href="/userprofile/list_address/" class="nav-item nav-link">Manage Address</a>
                         <a href="/userprofile/my_orders/" class="nav-item nav-link">My Orders</a>
+                        <a href="/userprofile/my-wallet/" class="nav-item nav-link">My Wallet</a>
 
 
                         {% comment %} <div class="nav-item dropdown">

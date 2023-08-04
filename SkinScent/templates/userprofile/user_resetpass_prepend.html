@@ -1,0 +1,38 @@
+{% extends 'userprofile/user_base_1.html' %}
+{% block content %}
+
+<div class="container user-login-container">
+    <h2 class="mt-4">Reset Password</h2>
+    <form method="POST" action="/userprofile/verify-reset-pass/">
+        {% csrf_token %}
+        {% if error_message %}
+        <div class="mt-3 alert alert-danger alert-dismissible fade show" role="alert">                            
+            {{ error_message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        {% endif %}
+        {% if success_message %}
+        <div class="mt-3 alert alert-success alert-dismissible fade show" role="alert">                            
+            {{ success_message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        {% endif %}
+        <div class="mb-3">
+          <label for="password_now" class="form-label">Current Password:</label>
+          <input type="password" class="form-control" id="password_now" name="password_now" required>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <span>| OR |</span>                
+        <a href="/userprofile/" class="ms-2">Skip it!</a>
+        <br>
+        <a href="/userprofile/forgot-pass/" class="ms-2">Forgot Password ?</a>
+    </form>
+</div>
+  
+
+{% endblock content %}  

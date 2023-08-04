@@ -1,0 +1,54 @@
+{% extends 'adminpanel/a_base1.html' %}
+
+
+{% block content %}
+
+<div class="container p-3">
+    <div class="row">
+        <div class="col-md-12">
+            <h4>List of Coupons</h4>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <h6>Active Coupons</h6>
+            <ul class="list-group">
+                {% for coupon in active_coupons %}
+                    <li class="list-group-item">{{ coupon.code }} - {{ coupon.discount }}% off - Expires on {{ coupon.valid_to }} - For Minimum purchase of ₹{{ coupon.minimum_purchase }}</li>
+                    <a href="/adminpanel/edit-coupon/{{coupon.id}}" class="btn btn-sm btn-secondary">Edit</a>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="col-md-6">
+            <h6>Expired Coupons</h6>
+            <ul class="list-group">                
+                {% for coupon in expired_coupons %}
+                    <li class="list-group-item">{{ coupon.code }} - {{ coupon.discount }}% off - Expired on {{ coupon.valid_to }} - For Minimum purchase of ₹{{ coupon.minimum_purchase }} </li>
+                    <a href="/adminpanel/edit-coupon/{{coupon.id}}" class="btn btn-sm btn-secondary">Edit</a>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <h6>De-activated Coupons</h6>
+            <ul class="list-group">
+                {% for coupon in removed_coupons %}
+                    <li class="list-group-item">{{ coupon.code }} - {{ coupon.discount }}% off - Expired on {{ coupon.valid_to|date:'Y-m-d\ H:i' }} </li>
+                    <a href="/adminpanel/edit-coupon/{{coupon.id}}" class="btn btn-sm btn-secondary">Edit</a>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <a href="/adminpanel/add-coupon/" class="btn btn-primary">Create New Coupon</a>
+        </div>
+    </div>
+
+</div>
+
+{% endblock content %} 

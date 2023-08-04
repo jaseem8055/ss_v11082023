@@ -9,8 +9,7 @@
     <meta content="Free HTML Templates" name="keywords">
     <meta content="Free HTML Templates" name="description">
 
-    <!-- Favicon -->
-    <link href="img/favicon.ico" rel="icon">
+    
 
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -49,7 +48,7 @@
             overflow: hidden;
             opacity: 0; /* Hide the zoomed image container by default */
             transition: opacity 0.3s;
-            z-index: 9999; /* Set a high z-index value to bring the container above all other elements */
+            z-index: 1; /* Set a high z-index value to bring the container above all other elements */
           }
           
           #product-carousel:hover + #zoomed-image-container {
@@ -120,9 +119,9 @@
                 </form>
             </div>
             <div class="col-lg-3 col-6 text-right">
-                <a href="" class="btn border">
+                <a href="/wishlist/" class="btn border">
                     <i class="fas fa-heart text-primary"></i>
-                    <span class="badge">0</span>
+                    <span class="badge">{{ wishlist_count }}</span>
                 </a>
                 <a href="/cart/" class="btn border">
                     <i class="fas fa-shopping-cart text-primary"></i>
@@ -230,131 +229,21 @@
     {% comment %} <script src="mail/jqBootstrapValidation.min.js"></script>
     <script src="mail/contact.js"></script> {% endcomment %}
 
+    <!-- Include jQuery Easing Plugin -->
+    <script src="{% static 'js/easing.min.js' %}"></script>
+
     <!-- Template Javascript -->
     <script src="{% static 'js/main.js' %}"></script>
 
-    <!----the source URL for the jQuery library.-->>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>  
+    
       
 
 
     <script>
-            // jQuery code
-            // Cart Page - Quantity & Price handling
-            $(document).ready(function() {
-                $('.btn-minus').click(function() {
-                    var input = $(this).parent().siblings('.quantity-input');
-                    var currentValue = parseInt(input.val());
-                    if (currentValue > 1) {
-                        input.val(currentValue - 1);
-                        updateItemTotal(input);
-                        updateSubtotal();
-                        updateTotal();
-                    }
-                });
-            
-                $('.btn-plus').click(function() {
-                    var input = $(this).parent().siblings('.quantity-input');
-                    var currentValue = parseInt(input.val());
-                    var maxQuantity = parseInt(input.data('max-quantity'));
-                    if (currentValue < maxQuantity) {
-                        input.val(currentValue + 1);
-                        updateItemTotal(input);
-                        updateSubtotal();
-                        updateTotal();
-                    }
-                });
-            
-                $('.quantity-input').change(function() {
-                    var input = $(this);
-                    var maxQuantity = parseInt(input.data('max-quantity'));
-                    var currentValue = parseInt(input.val());
-                    if (currentValue < 1) {
-                        input.val(1);
-                    } else if (currentValue > maxQuantity) {
-                        input.val(maxQuantity);
-                    }
-                    updateItemTotal(input);
-                    updateSubtotal();
-                    updateTotal();
-                });
-            
-                function updateItemTotal(input) {
-                    var quantity = parseInt(input.val());
-                    var price = parseFloat(input.closest('tr').find('.item-price').text().replace(/[^0-9.]/g, ''));
-                    var total = quantity * price;
-                    input.closest('tr').find('.item-total').text('₹' + total.toFixed(2));
-                }
-            
-                function updateSubtotal() {
-                    var subtotal = 0;
-                    $('.item-total').each(function() {
-                        var itemTotal = parseFloat($(this).text().replace(/[^0-9.]/g, ''));
-                        subtotal += itemTotal;
-                    });
-                    $('#subtotal').text('₹' + subtotal.toFixed(2));
-                }
-            
-                function updateTotal() {
-                    var subtotal = parseFloat($('#subtotal').text().replace(/[^0-9.]/g, ''));
-                    var shipping = 10; // Fixed shipping amount
-                    var total = subtotal + shipping;
-                    $('#total').text('₹' + total.toFixed(2));
-                }
-            
-                // Call the updateSubtotal function initially
-                updateSubtotal();
-                updateTotal();
-            });
-            
-               
-
-        
-
-        ////////////////////////////////////
-        // PRODUCT-DETAIL / Quantity buttons 
-        ////////////////////////////////////
-        /*
-        $(document).ready(function() {
-            var quantityVariable = parseInt($('#selected-quantity').text());
-            var countInput = $('#count-input');
-    
-            $('.btn-plus').on('click', function() {                
-                var count = parseInt(countInput.val());
-    
-                if (count < quantityVariable) {
-                    count++;
-                    countInput.val(count);
-                }
-            });
-    
-            $('.btn-minus').on('click', function() {                
-                var count = parseInt(countInput.val());
-    
-                if (count > 1) {
-                    count--;
-                    countInput.val(count);
-                }
-            });
-
-            countInput.on('input', function() {
-                var count = parseInt(countInput.val());
-    
-                if (isNaN(count) || count < 1) {
-                    count = 1;
-                } else if (count > quantityVariable) {
-                    count = quantityVariable;
-                }
-    
-                countInput.val(count);
-            });
-        });
-        */
-        
-        
         ////////////////////////////////
         // PRODUCT-DETAIL Variant Price
         ////////////////////////////////
+        /*
         $(document).ready(function() {
             $('input[type="radio"]').on('change', function() {
                 var selectedPrice = $(this).siblings('.price').data('variant-price');
@@ -370,18 +259,23 @@
                 var VariantStock = selectedQuantity;
                 var selectedVariantValue = selectedValue;
                 var selectedVariantPrice = selectedPrice;
-                console.log("Variant Stock :",VariantStock )
-                console.log("Variant Value :",selectedVariantValue )
-                console.log("Variant Value ID :",selectedValueId )
-                console.log("Variant Price :",selectedVariantPrice )
+                //console.log("Variant Stock :",VariantStock )
+                //console.log("Variant Value :",selectedVariantValue )
+                //console.log("Variant Value ID :",selectedValueId )
+                //console.log("Variant Price :",selectedVariantPrice )
+                
+                //Product Offer Case
+                
+
             });
         });        
-        
+        */
         ///////////////////////
         // PRODUCT ZOOM & CROP
         ///////////////////////
         function zoomImage(event, element) {
             var zoomedImage = document.getElementById('zoomed-image');
+            var zoomedImageContainer = document.getElementById('zoomed-image-container')
           
             // Calculate the position of the mouse pointer relative to the image
             var x = event.offsetX / element.offsetWidth;
@@ -395,7 +289,17 @@
           
             // Apply the zoom effect by scaling the image
             zoomedImage.style.transform = 'scale(2)'; // Adjust the zoom level as desired
+
+            // Change z-index to 999 on mouse hover
+            zoomedImageContainer.style.zIndex = 999;
           }
+
+          function resetZoomedImage() {
+            var zoomedImageContainer = document.getElementById('zoomed-image-container')
+            zoomedImageContainer.style.transform = 'none';
+            // Reset z-index to its initial value on mouse leave
+            zoomedImageContainer.style.zIndex = 1;
+        }
           
     </script>
 </body>

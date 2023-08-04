@@ -26,7 +26,7 @@
             </button>
             <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
                 <div class="navbar-nav mr-auto py-0">
-                    <a href="/" class="nav-item nav-link active">Home</a>
+                    <a href="/" class="nav-item nav-link">Home</a>
                     {% comment %} <a href="shop.html" class="nav-item nav-link">Shop</a> {% endcomment %}
                     <a href="/" class="nav-item nav-link">Shop</a>
                     {% comment %} <a href="detail.html" class="nav-item nav-link">Shop Detail</a> {% endcomment %}
@@ -103,11 +103,21 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="align-middle item-price">₹{{ cart_item.variant.price }}</td>
-                            <td class="align-middle item-total">₹{{ cart_item.get_item_total }}</td>
+                            {% if cart_item.new_price is not None and cart_item.new_price > 0.00 %}
+                                <td class="align-middle item-price">₹{{ cart_item.new_price }}</td>
+                            {% else %}
+                                <td class="align-middle item-price">₹{{ cart_item.variant.price }}</td>
+                            {% endif %}
+
+                            {% if cart_item.new_price is not None and cart_item.new_price > 0.00 %}
+                                <td class="align-middle item-total">₹{{ cart_item.get_item_total_new }}</td>
+                            {% else %}
+                                <td class="align-middle item-total">₹{{ cart_item.get_item_total }}</td>
+                            {% endif %}
+                            
                             {% comment %} <td class="align-middle"><button class="btn btn-sm btn-primary"><i class="fa fa-times"></i></button></td> {% endcomment %}
-                            <td class="align-middle">
-                                <a href="/remove_cart_item/{{ cart_item.id }}/" onclick= "return confirm('Are you sure, want to remove this item?')">
+                            <td class="align-middle remove-item">
+                                <a class="remove-cart-item" id="remove-item-link-{{ cart_item.id }}" href="/remove_cart_item/{{ cart_item.id }}/" onclick= "return confirm('Are you sure, want to remove this item?')">
                                     <button class="btn btn-sm btn-primary">
                                         <i class="fa fa-times"></i>
                                     </button>
@@ -126,15 +136,32 @@
                 </div>                  
             </div>
             
-            <div class="col-lg-4">
-                {% comment %} <form class="mb-5" action="">
+            <div class="col-lg-4">                
+                <form class="mb-5" method="POST" action="">
+                    {% csrf_token %}
                     <div class="input-group">
-                        <input type="text" class="form-control p-3" placeholder="Coupon Code">
+                        <input type="text" class="form-control" placeholder="Code" name="coupon_code" id="coupon-code">
                         <div class="input-group-append">
-                            <button class="btn btn-primary">Apply Coupon</button>
+                            <button id="apply-coupon-btn" class="btn btn-primary">Apply Coupon</button>
                         </div>
                     </div>
-                </form> {% endcomment %}
+                    <!-- Container for displaying the coupon code -->
+                    
+                    {% comment %} {% if applied_coupon %}
+                    <div>
+                        <p>Applied Coupon: {{ applied_coupon.code }}</p>
+                        <p id="discount-cent">Discount: {{ discount }}%</p>
+                    </div>
+                    {% else %}
+                        <p>No Coupon Applied</p>                        
+                    {% endif %} {% endcomment %}
+
+                    <div class="row">                
+                        <div id="coupon-code-container" class="col-lg-4"></div>
+                    </div>                    
+                </form>
+                
+                <input type="hidden" value={{discount}} id="cdiscount">
                 <div class="card border-secondary mb-5">
                     <div class="card-header bg-secondary border-0">
                         <h4 class="font-weight-semi-bold m-0">Cart Summary</h4>
@@ -142,17 +169,22 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between mb-3 pt-1">
                             <h6 class="font-weight-medium">Subtotal</h6>
-                            <h6 class="font-weight-medium" id="subtotal">₹0</h6>
+                            <h6 class="font-weight-medium" id="subtotal">₹{{sub_total}}</h6>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3 pt-1">
+                            <h6 class="font-weight-medium">Discount</h6>
+                            <h6 class="font-weight-medium" id="discount-display">₹{{ discount_amount }}</h6>
                         </div>
                         <div class="d-flex justify-content-between">
                             <h6 class="font-weight-medium">Shipping</h6>
-                            <h6 class="font-weight-medium">₹10</h6>
+                            <h6 class="font-weight-medium">₹10.00</h6>
                         </div>
+                        
                     </div>
                     <div class="card-footer border-secondary bg-transparent">
                         <div class="d-flex justify-content-between mt-2">
                             <h5 class="font-weight-bold">Total</h5>
-                            <h5 class="font-weight-bold" id="total">₹0</h5>
+                            <h5 class="font-weight-bold" id="total">₹{{total}}</h5>
                         </div>
                         <a href="/checkout/">                            
                             
@@ -169,10 +201,19 @@
         </div>
     </div>
     <!-- Cart End -->
+
+
+
+    <!-- Include SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.min.css">
+
+    <!-- Include SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.all.min.js"></script>
+
     
 
-     <!----UPDATE CARTITEM Model---->
-     <script>
+    <!----UPDATE CARTITEM Model---->
+    <script>
         /////////////////////////
         // Update CartItem Model
         /////////////////////////
@@ -190,7 +231,7 @@
             cartItemsQty: cartItemsQty
           };
       
-          console.log(cartItemsQty);
+          //console.log(cartItemsQty);
 
           fetch('/update-cart-items/', {
             method: 'POST',
@@ -201,7 +242,7 @@
             body: JSON.stringify(cartQtyList)
           })
 
-          console.log("Hi");            
+          //console.log("Hi");            
           
         };
       
@@ -209,8 +250,450 @@
         updateCartItemsBtn.addEventListener('click', updateCartItems);
         
         const proceedToCheckoutBtn = document.getElementById('proceed-to-checkout-btn');
-        proceedToCheckoutBtn.addEventListener('click', updateCartItems);
-      </script>
+        proceedToCheckoutBtn.addEventListener('click', updateCartItems);     
+        
+        // Add an event listener to each navbar menu item
+        const navbarMenuItems = document.querySelectorAll('.nav-item.nav-link');
+        navbarMenuItems.forEach(item => {
+        item.addEventListener('click', updateCartItems);
+        });
+
+        const navbarNav = document.querySelector('.navbar-nav.ml-auto.py-0');
+        navbarNav.addEventListener('click', updateCartItems);       
+       
+        
+    </script>
+    <!----UPDATE CARTITEM Model---->
+
+    <!----APPLY COUPON-->
+        <script>
+                
+            // Function to apply the coupon and Update Total
+            function applyCoupon() {
+                // Get the coupon code entered by the user
+                var couponCode = document.getElementById('coupon-code').value;
+                //console.log("Coupon = ", couponCode)
+                var subtotal = parseFloat($('#subtotal').text().replace(/[^0-9.]/g, ''));
+        
+                // Make an AJAX POST request to apply the coupon
+                $.ajax({
+                    type: "POST",
+                    url: "/apply-coupon/", // Replace with the actual URL of your Django view to apply the coupon
+                    headers: { "X-CSRFToken": "{{ csrf_token }}" }, // Add this line to include the CSRF token
+                    data: { coupon_code: couponCode, subtotal: subtotal },
+                    dataType: 'json',
+                    success: function(response) {
+                        // Handle the success response (if needed)
+                        //console.log("Coupon applied successfully!");
+                        // Now, response should contain the 'discount' value
+                        var discount = response.discount;
+
+                        // Hidden input for updating Total
+                        var cdiscountInput = document.getElementById('cdiscount');
+                        cdiscountInput.value = response.discount;   
+                        
+                        
+                        updateTotal(response.discount);
+                        displayCouponCode(couponCode, discount);
+                        //console.log("Check the div now!")
+                        
+                    },
+                    error: function(xhr, status, error) {
+                        // Handle the error if any
+                        //console.log(xhr.responseText);
+                        //alert("Coupon Code Not Found! Please try again.");
+                        try {
+                            var alert_msg = JSON.parse(xhr.responseText);
+                            //alert(alert_msg.error);
+                            showModal(alert_msg.error);
+                            couponCode.value = " "
+                        } catch (e) {
+                            alert("An error occurred. Please try again.");
+                        }
+                    }
+                });
+            }//applycoupon()
+
+            function updateTotal(discount) {
+                // Assuming you have elements with IDs 'subtotal', 'shipment_cost', and 'total'
+                var subtotal = parseFloat(document.getElementById('subtotal').innerText.replace(/[^0-9.]/g, ''));
+                // var shipmentCost = parseFloat(document.getElementById('shipment_cost').innerText.replace(/[^0-9.]/g, ''));
+                var shipmentCost = 10; // Fixed shipping amount
+        
+                // Calculate the new total after applying the discount
+                var discountAmount = (subtotal * discount) / 100;
+                var total = subtotal - discountAmount + shipmentCost;
+                //console.log("total =", total)
+
+                // Update the discount in the HTML (assuming you have a div with ID 'discount-display')
+                document.getElementById('discount-display').innerText = "₹" + discountAmount.toFixed(2); 
+        
+                // Update the total display
+                document.getElementById('total').innerText = "₹" + total.toFixed(2);
+                document.getElementsByName('coupon_code')[0].value = '';
+            }
+
+            // Display the coupon code with green bg and border
+            function displayCouponCode(couponCode, discount) {
+                var couponCodeElement = document.createElement('div');
+                couponCodeElement.innerText = couponCode + "-" + discount + "% off!";
+                couponCodeElement.className = 'coupon-code-text';
+                //document.getElementById('coupon-code-container col-lg-4').appendChild(couponCodeElement);
+                document.getElementById('coupon-code-container').appendChild(couponCodeElement);
+            }
+
+            // Function to show the modal
+            function showModal(msg) {                     
+                
+                Swal.fire({
+                title: "Coupon Response:",
+                text: msg,
+                icon: "info",
+                confirmButtonText: "OK",
+                allowOutsideClick: true,
+                backdrop: true,
+                });
+            }
+        
+            // Add an event listener to the form submit button
+            document.getElementById('apply-coupon-btn').addEventListener('click', function(event) {
+                event.preventDefault();
+                //console.log("Apply Coupon")
+                applyCoupon();
+            });
+        
+            
+        </script>
+    <!----APPLY COUPON-->
+    
+    <!----CLEAR COUPON---->
+        <script>
+            function clearCoupon() {
+                
+                const confirmed = confirm('Do you want to Clear the Coupon !?');
+                if (confirmed) {
+                
+                    // Make an AJAX POST request to apply the coupon
+                    $.ajax({
+                        type: "POST",
+                        url: "/clear-coupon/", 
+                        headers: { "X-CSRFToken": "{{ csrf_token }}" }, // include the CSRF token
+                        dataType: 'json',
+                        success: function(response) {
+                            // Handle the success response (if needed)
+                            //console.log(response.message);
+                            // Optionally, you can update the cart page after the coupon is cleared
+                            // For example, you can reload the page to update the cart with the new total
+                            window.location.reload();
+                        },
+                        error: function(xhr, status, error) {
+                            // Handle the error if any
+                            //console.log(xhr.responseText);
+                            alert("An error occurred. Please try again.");
+                        }
+                    });                   
+                }                
+            }
+
+            
+            function updateTotal_couponClear() {
+                // Assuming you have elements with IDs 'subtotal', 'shipment_cost', and 'total'
+                var subtotal = parseFloat(document.getElementById('subtotal').innerText.replace(/[^0-9.]/g, ''));
+                //var discount = parseFloat(document.getElementById('discount-display').innerText.replace(/[^0-9.]/g, ''));
+                // var shipmentCost = parseFloat(document.getElementById('shipment_cost').innerText.replace(/[^0-9.]/g, ''));
+                var shipmentCost = 10; // Fixed shipping amount
+        
+                // Calculate the new total after applying the discount
+                var discountAmount = 0;
+                var total = subtotal + shipmentCost;
+                //console.log("total =", total)
+
+                // Update the discount in the HTML (assuming you have a div with ID 'discount-display')
+                document.getElementById('discount-display').innerText = "₹" + discountAmount.toFixed(2); 
+        
+                // Update the total display
+                document.getElementById('total').innerText = "₹" + total.toFixed(2);
+            }
+
+            // Add an event listener to the form submit button
+            document.getElementById('coupon-code-container').addEventListener('click', function(event) {
+                event.preventDefault();
+                clearCoupon();
+            });
+        </script>
+    <!----CLEAR COUPON---->
+
+<!----the source URL for the jQuery library.-->>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>  
+    
+<!----CART PAGE - Quantity And Price Handling ---->
+    {% comment %} <script>
+        
+            $(document).ready(function() {
+                $('.btn-minus').click(function() {
+                    var input = $(this).parent().siblings('.quantity-input');
+                    var currentValue = parseInt(input.val());
+                    if (currentValue > 1) {
+                        input.val(currentValue - 1);
+                        updateItemTotal(input);
+                        updateSubtotal();
+                        updateTotal();
+                        updateCartItems();
+                    }
+                });
+            
+                $('.btn-plus').click(function() {
+                    var input = $(this).parent().siblings('.quantity-input');
+                    var currentValue = parseInt(input.val());
+                    var maxQuantity = parseInt(input.data('max-quantity'));
+                    if (currentValue < maxQuantity) {
+                        input.val(currentValue + 1);
+                        updateItemTotal(input);
+                        updateSubtotal();
+                        updateTotal();
+                        updateCartItems();
+                    }
+                    if (currentValue == maxQuantity){
+                        alert("Available Stock for Product is " + maxQuantity)
+                    }
+                });
+            
+                $('.quantity-input').change(function() {
+                    var input = $(this);
+                    var maxQuantity = parseInt(input.data('max-quantity'));
+                    var currentValue = parseInt(input.val());
+                    if (currentValue < 1) {
+                        input.val(1);
+                    } else if (currentValue > maxQuantity) {
+                        input.val(maxQuantity);
+                        alert("Available Stock for Product is " + maxQuantity)
+                    }
+                    updateItemTotal(input);
+                    updateSubtotal();
+                    updateTotal();
+                });
+            
+                function updateItemTotal(input) {
+                    var quantity = parseInt(input.val());
+                    var price = parseFloat(input.closest('tr').find('.item-price').text().replace(/[^0-9.]/g, ''));
+                    var total = quantity * price;
+                    input.closest('tr').find('.item-total').text('₹' + total.toFixed(2));
+                }
+            
+                function updateSubtotal() {
+                    var subtotal = 0;
+                    $('.item-total').each(function() {
+                        var itemTotal = parseFloat($(this).text().replace(/[^0-9.]/g, ''));
+                        subtotal += itemTotal;
+                    });
+                    $('#subtotal').text('₹' + subtotal.toFixed(2));
+                }
+            
+                function updateTotal() {
+                    var subtotal = parseFloat($('#subtotal').text().replace(/[^0-9.]/g, ''));
+                    //var discount_cent = parseFloat($('#discount-cent').text().replace(/[^0-9.]/g, ''));
+                    var discount_cent = {{discount}};
+
+                    var discount_amount = (subtotal * discount_cent) / 100
+
+                    var shipping = 10; // Fixed shipping amount
+
+                    //var discount = parseFloat($('#cdiscount').val());
+                    //var discountAmount = (subtotal * discount) / 100;
+                    //var discount_subtotal = subtotal - discountAmount;
+                    //console.log("Discounted_SubTotal = ",discount_subtotal);
+
+                    var total = subtotal - discount_amount + shipping;
+
+                    $('#discount-display').text('₹' + discount_amount.toFixed(2));
+                    $('#total').text('₹' + total.toFixed(2));
+                }
+
+                // Display the coupon code with green bg and border
+                function displayCouponCode(couponCode, discount) {
+                    var couponCodeElement = document.createElement('div');
+                    couponCodeElement.innerText = couponCode + "-" + discount + "% Off!";
+                    couponCodeElement.className = 'coupon-code-text';
+                    //document.getElementById('coupon-code-container col-lg-4').appendChild(couponCodeElement);
+                    document.getElementById('coupon-code-container').appendChild(couponCodeElement);
+                }
+            
+                // Call the updateSubtotal function initially
+                updateSubtotal();
+                updateTotal();
+
+                //Display Applied Coupon in CouponHistory
+                {% if applied_coupon.code  %}
+                displayCouponCode("{{applied_coupon.code}}", "{{applied_coupon.discount}}");
+                {% endif %}
+                
+            });
+            /////////////////////////////////////////
+            // jQuery code//////////////////////////
+            // Cart Page - Quantity & Price handling
+            ////////////////////////////////////////
+            //END
+
+    </script> {% endcomment %}
+
+    <script>
+            
+            $(document).ready(function() {
+                //var quantityInput = $('.quantity-input');
+                var itemTotal = $('.item-total');
+                var subtotalElement = $('#subtotal');
+                var discountDisplay = $('#discount-display');
+                var totalElement = $('#total');
+                var couponCodeContainer = $('#coupon-code-container');
+                
+
+                $(document).on('click', '.btn-minus', function() {
+                    // Handler code...
+                    var input = $(this).parent().siblings('.quantity-input');
+                    //var input = $('.quantity-input');
+                    var currentValue = parseInt(input.val());
+                    if (currentValue > 1) {
+                        input.val(currentValue - 1);
+                        updateItemTotal(input);
+                        updateSubtotal();
+                        updateTotal();
+                        updateCartItems();                
+                    }                    
+                    if (currentValue < 1) {
+                        input.val(1);
+                    }
+                    
+
+                });
+
+
+                $(document).on('click', '.btn-plus', function() {
+                    // Handler code...
+                    var input = $(this).parent().siblings('.quantity-input');
+                    //var input = $('.quantity-input');
+                    var currentValue = parseInt(input.val());
+                    var maxQuantity = parseInt(input.data('max-quantity'));
+                    
+                    if (currentValue < maxQuantity) {
+                        input.val(currentValue + 1);
+                        updateItemTotal(input);
+                        updateSubtotal();
+                        updateTotal();
+                        updateCartItems();
+                    }
+                    if (currentValue > maxQuantity) {
+                        input.val(maxQuantity);
+                        //alert("Available Stock for Product is " + maxQuantity)
+                        showModal();
+                    }
+                });
+            
+
+                $(document).on('change', '.quantity-input', function() {
+                    // Handler code...
+                    var input = $(this);
+                    var maxQuantity = parseInt(input.data('max-quantity'));
+                    var currentValue = parseInt(input.val());                    
+                    if (isNaN(currentValue) || currentValue < 1) {
+                        input.val(1);
+                    } else if (currentValue > maxQuantity) {
+                        input.val(maxQuantity);
+                        showModal();
+                    }
+                    updateItemTotal(input);
+                    updateSubtotal();
+                    updateTotal();
+                });
+            
+                function updateItemTotal(input) {
+                    var quantity = parseInt(input.val());
+                    var price = parseFloat(input.closest('tr').find('.item-price').text().replace(/[^0-9.]/g, ''));
+                    var total = quantity * price;
+                    input.closest('tr').find('.item-total').text('₹' + total.toFixed(2));
+                }
+            
+                function updateSubtotal() {
+                    var subtotal = 0;
+                    $('.item-total').each(function() {
+                        var itemTotal = parseFloat($(this).text().replace(/[^0-9.]/g, ''));
+                        subtotal += itemTotal;
+                    });
+                    $('#subtotal').text('₹' + subtotal.toFixed(2));
+                }
+            
+                function updateTotal() {
+                    var subtotal = parseFloat($('#subtotal').text().replace(/[^0-9.]/g, ''));
+                    //var discount_cent = parseFloat($('#discount-cent').text().replace(/[^0-9.]/g, ''));
+                    var discount_cent = {{discount}};
+                    var discount_amount = (subtotal * discount_cent) / 100
+                    var shipping = 10; // Fixed shipping amount
+
+                    //var discount = parseFloat($('#cdiscount').val());
+                    //var discountAmount = (subtotal * discount) / 100;
+                    //var discount_subtotal = subtotal - discountAmount;
+                    //console.log("Discounted_SubTotal = ",discount_subtotal);
+
+                    var total = subtotal - discount_amount + shipping;
+
+                    $('#discount-display').text('₹' + discount_amount.toFixed(2));
+                    $('#total').text('₹' + total.toFixed(2));
+                }
+
+                // Display the coupon code with green bg and border
+                function displayCouponCode(couponCode, discount) {
+                    var couponCodeElement = document.createElement('div');
+                    couponCodeElement.innerText = couponCode + "-" + discount + "% Off!";
+                    couponCodeElement.className = 'coupon-code-text';
+                    //document.getElementById('coupon-code-container col-lg-4').appendChild(couponCodeElement);
+                    document.getElementById('coupon-code-container').appendChild(couponCodeElement);
+                }                
+
+                // Function to show the modal
+                function showModal() {  
+                    var input = $('.quantity-input');          
+                    var maxQuantity = parseInt(input.data('max-quantity'));
+                    Swal.fire({
+                    title: "Available Stock for Product",
+                    text: "The available stock for this product is " + maxQuantity,
+                    icon: "info",
+                    confirmButtonText: "OK",
+                    allowOutsideClick: true,
+                    backdrop: true,
+                    });
+                }
+            
+                // Call the updateSubtotal function initially
+                updateSubtotal();
+                updateTotal();
+
+                //Display Applied Coupon in CouponHistory
+                {% if applied_coupon.code  %}
+                displayCouponCode("{{applied_coupon.code}}", "{{applied_coupon.discount}}");
+                {% endif %}
+                
+            });
+            /////////////////////////////////////////
+            // jQuery code//////////////////////////
+            // Cart Page - Quantity & Price handling
+            ////////////////////////////////////////
+            //END
+
+    </script>
+
+
+
+    
+    <style>
+        .coupon-code-text {
+            display: inline-block;
+            background-color: green;
+            color: white;
+            padding: 5px;
+            border: 1px solid green;
+            margin-top: 10px;
+        }
+    </style>
+    
 
 
 

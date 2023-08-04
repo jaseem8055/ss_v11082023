@@ -1,5 +1,197 @@
 {% extends 'adminpanel/a_base1.html' %}
 
+{% load static %}
+
 {% block content %}
-<h1>This is Admin Dashboard</h1>
+
+<div class="container p-3">
+    <form id="filterForm">
+      <label for="year">Choose a year:</label>
+      <select name="year" id="year"></select>
+      <input type="submit" value="Load" name="_load">
+    </form>
+    <div class="row p-3">        
+      <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Annual Sales by Month</div>  
+            <div class="card-body">                
+                <canvas id="salesChart"></canvas>
+            </div>          
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Annual Sales by Customers</div>  
+            <div class="card-body">                
+                <canvas id="spendPerCustomerChart"></canvas>
+            </div>          
+        </div>        
+      </div>
+
+      <div class="col-md-6">
+        <div class="card mt-3">
+            <div class="card-header">Payments Status</div>   
+            <div class="card-body">         
+                <canvas id="paymentSuccessChart"></canvas>
+            </div>
+          </div> 
+      </div>     
+
+      <div class="col-md-6">
+        <div class="card mt-3">
+            <div class="card-header">Payments Method</div>   
+            <div class="card-body">         
+                <canvas id="paymentMethodChart"></canvas>
+            </div>
+          </div>        
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js"></script>
+
+    <script
+      src="https://code.jquery.com/jquery-3.6.4.min.js"
+      integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8="
+      crossorigin="anonymous">
+    </script>
+
+    <script>
+        let salesCtx = document.getElementById("salesChart").getContext("2d");
+        let salesChart = new Chart(salesCtx, {
+          type: "line",
+          options: {
+            responsive: true,
+            title: {
+              display: false,
+              text: ""
+            }
+          }
+        });
+
+        // ORDER PER USER FOR THE YEAR
+        let spendPerCustomerCtx = document.getElementById("spendPerCustomerChart").getContext("2d");
+        let spendPerCustomerChart = new Chart(spendPerCustomerCtx, {
+          type: "bar",
+          options: {
+            responsive: true,
+            title: {
+              display: false,
+              text: ""
+            }
+          }
+        });
+
+
+
+
+                
+        let paymentSuccessCtx = document.getElementById("paymentSuccessChart").getContext("2d");
+        let paymentSuccessChart = new Chart(paymentSuccessCtx, {
+          type: "pie",
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            aspectRatio: 1,
+            title: {
+              display: false,
+              text: ""
+            },
+            layout: {
+              padding: {
+                left: 0,
+                right: 0,
+                top: 0,
+                bottom: 25
+              }
+            }
+          }
+        });       
+
+        
+        let paymentMethodCtx = document.getElementById("paymentMethodChart").getContext("2d");
+        let paymentMethodChart = new Chart(paymentMethodCtx, {
+          type: "pie",
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            aspectRatio: 1,
+            title: {
+              display: false,
+              text: ""
+            },
+            layout: {
+              padding: {
+                left: 0,
+                right: 0,
+                top: 0,
+                bottom: 25
+              }
+            }
+          }
+        });        
+      </script>
+
+      <script>
+        $(document).ready(function() {
+          $.ajax({
+            url: "/adminpanel/chart/filter-options/",
+            type: "GET",
+            dataType: "json",
+            success: (jsonResponse) => {
+              // Load all the options
+              jsonResponse.options.forEach(option => {
+                $("#year").append(new Option(option, option));
+              });
+              // Load data for the first option
+              loadAllCharts($("#year").children().first().val());
+            },
+            error: () => console.log("Failed to fetch chart filter options!")
+          });
+        });
+      
+        $("#filterForm").on("submit", (event) => {
+          event.preventDefault();
+      
+          const year = $("#year").val();
+          console.log("Year =", year)
+          loadAllCharts(year)
+        });
+      
+        function loadChart(chart, endpoint) {
+          $.ajax({
+            url: endpoint,
+            type: "GET",
+            dataType: "json",
+            success: (jsonResponse) => {
+              // Extract data from the response
+              const title = jsonResponse.title;
+              const labels = jsonResponse.data.labels;
+              const datasets = jsonResponse.data.datasets;
+      
+              // Reset the current chart
+              chart.data.datasets = [];
+              chart.data.labels = [];
+      
+              // Load new data into the chart
+              chart.options.title.text = title;
+              chart.options.title.display = true;
+              chart.data.labels = labels;
+              datasets.forEach(dataset => {
+                chart.data.datasets.push(dataset);
+              });
+              chart.update();
+            },
+            error: () => console.log("Failed to fetch chart data from " + endpoint + "!")
+          });
+        }
+      
+        function loadAllCharts(year) {
+            loadChart(salesChart, `/adminpanel/chart/sales/${year}/`);
+            loadChart(spendPerCustomerChart, `/adminpanel/chart/spend-per-customer/${year}/`);
+            loadChart(paymentSuccessChart, `/adminpanel/chart/payment-success/${year}/`);
+            loadChart(paymentMethodChart, `/adminpanel/chart/payment-method/${year}/`);
+        }
+      </script>
+
 {% endblock content %}

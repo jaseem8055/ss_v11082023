@@ -116,16 +116,26 @@
             <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
                 <div class="navbar-nav mr-auto py-0">
                     <a href="/adminpanel/" class="nav-item nav-link active">Home</a>
-                    <a href="#" class="nav-item nav-link">Category</a>
-                    <a href="#" class="nav-item nav-link">Products</a>
+                    <a href="/adminpanel/list_cat/" class="nav-item nav-link">Category</a>
+                    <a href="/adminpanel/order_summary/" class="nav-item nav-link">Orders</a>
                     <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Orders</a>
+                        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Products</a>
                         <div class="dropdown-menu rounded-0 m-0">
-                            <a href="/adminpanel/order_summary/" class="dropdown-item">Order Summary</a>
-                            <a href="#" class="dropdown-item">Order_2</a>
+                            <a href="/adminpanel/list_product/" class="dropdown-item">List Products</a>
+                            <a href="/adminpanel/start_variant/" class="dropdown-item">Variants</a>
                         </div>
                     </div>
-                    <a href="#" class="nav-item nav-link">Costumers</a>
+                    <a href="/adminpanel/list_users/" class="nav-item nav-link">Costumers</a>
+                    <a href="/adminpanel/coupon/" class="nav-item nav-link">Coupon</a>                    
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Offers</a>
+                        <div class="dropdown-menu rounded-0 m-0">
+                            <a href="/adminpanel/offers/" class="dropdown-item">Offer Titles</a>
+                            <a href="" class="dropdown-item">Product Offers</a>
+                            <a href="" class="dropdown-item">Category Offers</a>
+                            <a href="" class="dropdown-item">referral Offers</a>
+                        </div>
+                    </div>
                 </div>
                 <div class="navbar-nav ml-auto py-0">
                     {% comment %} <a href="#" class="nav-item nav-link">Login</a> {% endcomment %}
@@ -184,7 +194,16 @@
                         <a href="/adminpanel/order_summary/" class="nav-item nav-link">Orders</a>
                         {% comment %} <a href="/list_users/" class="nav-item nav-link">Customers</a> {% endcomment %}
                         <a href="/adminpanel/list_users/" class="nav-item nav-link">Customers</a>
-                        <a href="" class="nav-item nav-link">Coupon</a>
+                        <a href="/adminpanel/coupon/" class="nav-item nav-link">Coupon</a>
+                        <div class="nav-item dropdown">
+                            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Offers</a>
+                            <div class="dropdown-menu rounded-0 m-0">
+                                <a href="/adminpanel/offers/" class="dropdown-item">Offer Titles</a>
+                                <a href="/adminpanel/offers/product" class="dropdown-item">Product Offers</a>
+                                <a href="" class="dropdown-item">Category Offers</a>
+                                <a href="" class="dropdown-item">referral Offers</a>
+                            </div>
+                        </div>
                         {% comment %} <a href="" class="nav-item nav-link">Sportswear</a> {% endcomment %}
                         {% comment %} <a href="" class="nav-item nav-link">Jumpsuits</a> {% endcomment %}
                         {% comment %} <a href="" class="nav-item nav-link">Blazers</a> {% endcomment %}

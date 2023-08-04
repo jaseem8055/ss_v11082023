@@ -1,0 +1,218 @@
+{% extends 'adminpanel/a_base1.html' %}
+
+{% block content %}  
+
+  <!---NEW-->
+  {% comment %} Page Loaded at : {{ page_loaded_at }}
+  <div class="container p-3">    
+    <h3>Product Offers</h3>
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <h6>Existing Offers</h6>
+        <ul class="list-group">
+          {% if existing_offers %}
+            <li class="list-group-item"><strong>Offer Title :</strong> {{ existing_offers.0.offer.name }}-ID#{{ existing_offers.0.offer.id }} - {{ existing_offers.0.offer.start_date }} to {{ existing_offers.0.offer.end_date }}</li>
+          {% else %}
+            <li class="list-group-item">No Data to Display</li>
+          {% endif %}
+          
+          {% for offer in existing_offers %}
+            <li class="list-group-item"><strong>{{ offer.product.name }}-ID#{{offer.id}} - {{ offer.discount_percentage }}% Off</strong>  - {{ offer.start_date }} to {{ offer.end_date }}
+              ||<span><a href="/adminpanel/offers/product/edit/{{offer.pk}}">Edit</a></span>
+            </li>            
+          {% endfor %}               
+        </ul>
+      </div>
+    </div>
+  
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <h6>Upcoming Offers</h6>
+        <ul class="list-group">
+          {% if upcoming_offers %}
+            <li class="list-group-item"><strong>Offer Title :</strong> {{ upcoming_offers.0.offer.name }}-ID#{{ upcoming_offers.0.offer.id }} - {{ upcoming_offers.0.offer.start_date }} to {{ upcoming_offers.0.offer.end_date }}</li>
+          {% else %}
+            <li class="list-group-item">No Data to Display</li>
+          {% endif %}
+          
+          {% for offer in upcoming_offers %}
+            <li class="list-group-item"><strong>{{ offer.product.name }}-ID#{{offer.id}} - {{ offer.discount_percentage }}% Off</strong>  - {{ offer.start_date }} to {{ offer.end_date }}
+              ||<span><a href="/adminpanel/offers/product/edit/{{offer.pk}}">Edit</a></span>
+            </li>            
+          {% endfor %}          
+        </ul>
+      </div>
+    </div>
+  
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <h6>Expired Offers</h6>
+        <ul class="list-group">
+          {% if expired_offers %}
+            <li class="list-group-item"><strong>Offer Title :</strong> {{ expired_offers.0.offer.name }}-ID#{{ expired_offers.0.offer.id }} - {{ expired_offers.0.offer.start_date }} to {{ expired_offers.0.offer.end_date }}</li>
+          {% else %}
+            <li class="list-group-item">No Data to Display</li>
+          {% endif %}
+          
+          {% for offer in expired_offers %}
+            <li class="list-group-item"><strong>{{ offer.product.name }}-ID#{{offer.id}} - {{ offer.discount_percentage }}% Off</strong>  - {{ offer.start_date }} to {{ offer.end_date }}
+              ||<span><a href="/adminpanel/offers/product/edit/{{offer.pk}}">Edit</a></span>
+            </li>            
+          {% endfor %}           
+        </ul>
+      </div>
+    </div>
+  
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <h6>Deactivated Offers</h6>
+        <ul class="list-group">
+          {% if deactivated_offers %}
+            <li class="list-group-item"><strong>Offer Title :</strong> {{ deactivated_offers.0.offer.name }}-ID#{{ deactivated_offers.0.offer.id }} - {{ deactivated_offers.0.offer.start_date }} to {{ deactivated_offers.0.offer.end_date }}</li>
+          {% else %}
+            <li class="list-group-item">No Data to Display</li>
+          {% endif %}
+          
+          {% for offer in deactivated_offers %}
+            <li class="list-group-item"><strong>{{ offer.product.name }}-ID#{{offer.id}} - {{ offer.discount_percentage }}% Off</strong>  - {{ offer.start_date }} to {{ offer.end_date }}
+              ||<span><a href="/adminpanel/offers/product/edit/{{offer.pk}}">Edit</a></span>
+            </li>            
+          {% endfor %}            
+        </ul>
+      </div>
+    </div>
+  
+    <a href="/adminpanel/offers/product/create/" class="btn btn-primary mt-3">Add New Offer</a>
+  </div> {% endcomment %}
+
+
+  <!---FINAL-->  
+  Page Loaded at : {{ page_loaded_at }}
+  <div class="container p-3">    
+    <h3>Product Offers</h3>
+    
+    <!--EXISTING OFFERS-->
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <h6>Existing Offers</h6>
+        {% if not offer_dict %}
+          <ul class="list-group">            
+              <li class="list-group-item">No Data to Display</li>
+          </ul>
+        {% endif %}
+        {% for offer, product_offers in offer_dict.items %}
+        <ul class="list-group">
+          {% if product_offers %}
+            <li class="list-group-item"><strong>Offer Title :</strong> {{ offer.name }}-ID#{{ offer.id }} - {{ offer.start_date }} to {{ offer.end_date }}</li>
+          {% else %}
+            <li class="list-group-item">No Data to Display</li>
+          {% endif %}
+          
+          {% for product_offer in product_offers %}
+            <li class="list-group-item"><strong>{{ product_offer.product.name }}-ID#{{product_offer.id}} - {{ product_offer.discount_percentage }}% Off</strong>  - {{ product_offer.start_date }} to {{ product_offer.end_date }}
+              ||<span><a href="/adminpanel/offers/product/edit/{{offer.pk}}">Edit</a></span>
+            </li>            
+          {% endfor %}
+          <br>
+        {% endfor %}              
+        </ul>
+      </div>
+    </div>
+    <!---EXISTING OFFERS-->
+
+    <!---UPCOMING OFFERS--->
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <h6>Upcoming Offers</h6>
+        {% if not upcoming_offer_dict %}
+          <ul class="list-group">            
+              <li class="list-group-item">No Data to Display</li>
+          </ul>
+        {% endif %}
+        {% for offer, product_offers in upcoming_offer_dict.items %}
+        <ul class="list-group">
+          {% if product_offers %}          
+            <li class="list-group-item"><strong>Offer Title :</strong> {{ offer.name }}-ID#{{ offer.id }} - {{ offer.start_date }} to {{ offer.end_date }}</li>
+          {% else %}
+            <li class="list-group-item">No Data to Display</li>
+          {% endif %}
+          
+          {% for offer in product_offers %}
+            <li class="list-group-item"><strong>{{ offer.product.name }}-ID#{{offer.id}} - {{ offer.discount_percentage }}% Off</strong>  - {{ offer.start_date }} to {{ offer.end_date }}
+              ||<span><a href="/adminpanel/offers/product/edit/{{offer.pk}}">Edit</a></span>
+            </li>            
+          {% endfor %}  
+          <br>
+        {% endfor %}        
+        </ul>
+      </div>
+    </div>
+    <!---UPCOMING OFFERS--->
+
+
+    <!---EXPIRED OFFERS--->
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <h6>Expired Offers</h6>
+        {% if not expired_offer_dict %}
+          <ul class="list-group">            
+              <li class="list-group-item">No Data to Display</li>
+          </ul>
+        {% endif %}
+        {% for offer, product_offers in expired_offer_dict.items %}
+        <ul class="list-group">
+          {% if offer or  product_offers %}          
+            <li class="list-group-item"><strong>Offer Title :</strong> {{ offer.name }}-ID#{{ offer.id }} - {{ offer.start_date }} to {{ offer.end_date }}</li>
+          {% else %}            
+            <li class="list-group-item">No Data to Display</li>
+          {% endif %}
+          
+          {% for offer in product_offers %}
+            <li class="list-group-item"><strong>{{ offer.product.name }}-ID#{{offer.id}} - {{ offer.discount_percentage }}% Off</strong>  - {{ offer.start_date }} to {{ offer.end_date }}
+              ||<span><a href="/adminpanel/offers/product/edit/{{offer.pk}}">Edit</a></span>
+            </li>            
+          {% endfor %}  
+          <br>
+        {% endfor %}        
+        </ul>
+      </div>
+    </div>
+    <!---EXPIRED OFFERS--->
+  
+    <!---DEACTIVATED OFFERS--->
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <h6>Inactive Offers</h6>
+        {% if not inactive_offer_dict %}
+          <ul class="list-group">            
+              <li class="list-group-item">No Data to Display</li>
+          </ul>
+        {% endif %}
+        {% for offer, product_offers in inactive_offer_dict.items %}
+        <ul class="list-group">
+          {% if product_offers %}          
+            <li class="list-group-item"><strong>Offer Title :</strong> {{ offer.name }}-ID#{{ offer.id }} - {{ offer.start_date }} to {{ offer.end_date }}</li>
+          {% else %}
+            <li class="list-group-item">No Data to Display</li>
+          {% endif %}
+          
+          {% for offer in product_offers %}
+            <li class="list-group-item"><strong>{{ offer.product.name }}-ID#{{offer.id}} - {{ offer.discount_percentage }}% Off</strong>  - {{ offer.start_date }} to {{ offer.end_date }}
+              ||<span><a href="/adminpanel/offers/product/edit/{{offer.pk}}">Edit</a></span>
+            </li>            
+          {% endfor %}  
+          <br>
+        {% endfor %}        
+        </ul>
+      </div>
+    </div>
+    <!---DEACTIVATED OFFERS--->
+  
+  
+    <a href="/adminpanel/offers/product/create/" class="btn btn-primary mt-3">Add New Offer</a>
+  </div>
+
+
+
+
+{% endblock content %} 

@@ -16,37 +16,145 @@
 <!-- Page Header End -->
 
 <div class="container">
-    
-    <div class="card p-3">
-        <div class="card-header">
-            <h1 class="m-auto">Order Placed Successfully!</h1>
+    <div id="pdfContent">
+        <!-- PRINT content goes here -->
+        <div class="card p-3">
+            <div class="card-header">
+                <h3 class="m-auto">Thank You! Your Order has been placed Successfully!</h3>
+            </div>
+            <h5 class="mt-4">Order Number:</h5>
+            <p class="fw-bold">{{ order.order_number }}</p>
+            <h5 class="mt-4">Shipping Address:</h5>
+            <p class="fw-bold"> {{ order.shipping_address }}</p>
+            <h5 class="mt-4">Payment Method:</h5>
+            <p class="fw-bold"> {{ order.payment_method }}</p>
+            <h5 class="mt-4">Order Items:</h5>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Variant</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Item Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order_item in order.orderitem_set.all %}
+                    <tr>
+                        <td>{{ order_item.product.name }}</td>
+                        <td>{{ order_item.variant.variant_value }} {{ order_item.product.unit_of_measurement.unit }}</td>
+                        <td>{{ order_item.quantity }}</td>
+                        <td>{{ order_item.price }}</td>
+                        <td>{{ order_item.get_item_total }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td> </td>
+                        <td> </td>
+                        <td> </td>
+                        <td>Sub Total :</td>
+                        <td>{{ order.sub_total }}</td>
+                    </tr>
+                    <tr>
+                        <td> </td>
+                        <td> </td>
+                        <td> </td>
+                        <td>Discount :</td>
+                        <td>{{ order.coupon_discount }}</td>
+                    </tr>
+                    <tr>
+                        <td> </td>
+                        <td> </td>
+                        <td> </td>
+                        <td>Shipment Cost :</td>
+                        <td>{{ order.shipment_cost }}</td>
+                    </tr>
+                    <tr>
+                        <td> </td>
+                        <td> </td>
+                        <td> </td>
+                        <td>Total Bill:</td>
+                        <td>{{ total }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            {% if coupon_code != None %}
+                            In this Order, You have availed {{coupon_discount}}% discount by using Coupon Code: {{coupon_code}}
+                            {% endif %}
+                        </td>
+                    </tr>                
+                </tbody>
+            </table>
         </div>
-        <h3 class="mt-4">Order Number:</h3>
-        <p class="fw-bold">{{ order.order_number }}</p>
-        <h3 class="mt-4">Shipping Address:</h3>
-        <p class="fw-bold"> {{ order.shipping_address }}</p>
-        <h3 class="mt-4">Order Items:</h3>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Product</th>
-                    <th>Variant</th>
-                    <th>Quantity</th>
-                    <th>Price</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for order_item in order.orderitem_set.all %}
-                <tr>
-                    <td>{{ order_item.product.name }}</td>
-                    <td>{{ order_item.variant.variant_value }} {{ order_item.product.unit_of_measurement.unit }}</td>
-                    <td>{{ order_item.quantity }}</td>
-                    <td>{{ order_item.price }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+        <!-- PRINT content goes here -->
+      </div>
+      <!-- Replace `123` with the actual ID of the model instance you want to download -->
+        <a href="{% url 'shop:download_pdf' order.pk %}" target="_blank">Download Invoice</a>      
 </div>
+
+<!-- Include jsPDF library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+
+<!-- Include html2pdf.js library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<script>
+    document.getElementById('pdfButton').addEventListener('click', async function () {
+      // Create a new jsPDF instance
+      const doc = new jspdf.jsPDF();
+  
+      // Get the content container
+      const content = document.getElementById('pdfContent');
+  
+      // Use html2pdf to generate the PDF from the content
+      const pdf = await html2pdf().from(content).set({
+        margin: 15,
+        filename: 'order_success.pdf',
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      }).outputPdf();
+  
+      // Add the generated PDF content to the jsPDF instance
+      doc.addPage();
+      doc.setProperties({
+        title: 'Order Success'
+      });
+      doc.setLanguage('en-US');
+      doc.setFontSize(12);
+      doc.text(10, 10, 'Thank You! Your Order has been placed Successfully!');
+      doc.text(10, 20, 'Order Number: ' + '{{ order.order_number }}');
+      
+      doc.text(10, 40, 'Payment Method: ' + '{{ order.payment_method }}');
+  
+      // Save the PDF
+      doc.save();
+    });
+  </script>
+  
+{% comment %} 
+<script>
+    document.getElementById('pdfButton').addEventListener('click', function () {
+      // Create a new jsPDF instance
+      //const doc = new jsPDF();
+
+      // Create a new jsPDF instance
+        const doc = new jspdf.jsPDF();
+    
+      // Add content to the PDF document
+      const content = document.getElementById('pdfContent'); // Replace 'pdfContent' with the ID of the container that holds your content
+      
+      // Use html2pdf to generate the PDF from the content
+        html2pdf().from(content).set({
+            margin: 15,
+            filename: 'order_success.pdf',
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        }).save();      
+      
+      
+    });
+    </script> {% endcomment %}
+    
 
 {% endblock content %} 

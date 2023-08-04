@@ -1,0 +1,51 @@
+{% extends 'adminpanel/a_base1.html' %}
+
+
+{% block content %} 
+
+<div class="container p-1">
+    <h4>Add Coupon</h4>
+</div>
+    <div class="container p-3 user-login-container">
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="code" class="form-label">Coupon Code:</label>
+                <input type="text" id="code" name="code" class="form-control" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="discount" class="form-label">Discount:</label>
+                <input type="number" id="discount" name="discount" step="0.01" class="form-control" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="valid_from" class="form-label">Valid From:</label>
+                <input type="datetime-local" id="valid_from" name="valid_from" class="form-control" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="valid_to" class="form-label">Valid To:</label>
+                <input type="datetime-local" id="valid_to" name="valid_to" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="minimum_purchase" class="form-label">Minimum Purchase:</label>
+                <input type="number" id="minimum_purchase" name="minimum_purchase" step="0.01" class="form-control" value="0" required>
+            </div>
+            
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="active" name="active" checked>
+                <label class="form-check-label" for="active">Active</label>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Create Coupon</button>
+            ||<a href="/adminpanel/coupon/"><span>Go Back</span></a>
+        </form>
+    </div>
+
+
+{% endblock content %} 
+
+{% comment %} There is no need to specify an action attribute for the form when using Django views to handle the form submission. 
+When you omit the action attribute, the form will be submitted to the same URL as the one from which it was loaded. {% endcomment %}

@@ -1,0 +1,215 @@
+{% extends 'adminpanel/a_base1.html' %}
+
+{% block content %}
+
+
+<!---NEW-->
+<div class="container p-3">
+  <h4>Create New Product Offer</h4>
+  <hr>
+  <form method="post" id="productOfferForm" action="{% url 'adminpanel:create_product_offer' %}">
+    {% csrf_token %}
+
+    <div class="form-group">
+      <label for="offer">Offer Title:</label>
+      <select name="offer" id="offer" class="form-control" required>
+        <option value="">Select One</option>
+        {% for offer in offers %}
+          <option value="{{ offer.pk }}" data-start-date="{{ offer.start_date }}" data-end-date="{{ offer.end_date }}">
+            {{ offer.name }} ({{ offer.start_date }} to {{ offer.end_date|default:"Ongoing" }})
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="product">Product:</label>
+      <select name="product" id="product" class="form-control" required>
+        <option value="">Choose Product</option>
+        {% for product in products %}
+          <option value="{{ product.pk }}">{{ product.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    {% if error_message %}
+        <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+            {{ error_message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endif %}
+
+    <div class="form-group">
+      <label for="discount_percentage">Discount Percentage:</label>
+      <input type="number" id="discount_percentage" name="discount_percentage" class="form-control" min="1" max="100" required>
+       <!-- Display an error message for invalid input -->
+       <small class="error-message" id="discountPercentageError"></small>
+    </div>
+
+    <h6>Choose the Date within the period of Selected Title Offers <span id="offerDateRange"></span></h6>
+    
+
+    <div class="form-group">
+      <label for="start_date">Start Date:</label>
+      <input type="datetime-local" id="start_date" name="start_date" class="form-control" required>
+      <!-- Display an error message for invalid input -->
+      <small class="error-message" id="startDateError"></small>
+    </div>
+
+    <div class="form-group">
+      <label for="end_date">End Date:</label>
+      <input type="datetime-local" id="end_date" name="end_date" class="form-control" required>
+      <!-- Display an error message for invalid input -->
+      <small class="error-message" id="endDateError"></small>
+    </div>
+
+    <div class="form-check mb-3">
+      <input type="checkbox" id="active" name="active" class="form-check-input" checked>
+      <label for="active" class="form-check-label">Active:</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create Offer</button>
+    ||<a href="/adminpanel/offers/product/"><span>Go Back</span></a>
+  </form>
+  <!--CONTAINER END-->
+</div>
+
+
+<script>
+  function formatDate(inputDate) {
+    //console.log("InputDate =", inputDate)
+    const months = [
+      "Jan.", "Feb.", "March", "April", "May", "June",
+      "July", "Aug.", "Sept.", "Oct.", "Nov.", "Dec."
+    ];
+  
+    // Step 1: Split the input date string into components
+    const dateComponents = inputDate.split(/[\s,]+/);
+    //console.log("Splitted :", dateComponents)
+  
+    // Step 2: Extract relevant date and time components
+    const month = months.indexOf(dateComponents[0]) + 1;
+    const day = parseInt(dateComponents[1], 10);
+    const year = parseInt(dateComponents[2], 10);
+  
+    const timeComponents = dateComponents[3].split(":");
+    let hours = parseInt(timeComponents[0], 10);
+    const minutes = parseInt(timeComponents[1], 10);
+  
+    // Step 3: Adjust hours for p.m. format
+    if (dateComponents[4] === "p.m.") {
+      hours += 12;
+    }
+  
+    // Step 4: Format the date in the required format "yyyy-MM-ddThh:mm"
+    const formattedDate = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}T${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+  
+    return formattedDate;
+  }
+  
+  // Example usage
+  //const inputDate = "July 28, 2023, 5:23 p.m.";
+  //const formattedDate = formatDate(inputDate);
+  //console.log(formattedDate); // Output: "2023-07-28T17:23"
+  
+    // Add event listener to the select element
+    document.getElementById('offer').addEventListener('change', function () {
+      // Get the selected option element
+      const selectedOption = this.options[this.selectedIndex];
+  
+      // Fetch the "data-start-date" and "data-end-date" attributes
+      const startDate = selectedOption.getAttribute('data-start-date');
+      const endDate = selectedOption.getAttribute('data-end-date');
+
+      //console.log("start_date = ", startDate, "end_date = ", endDate)
+  
+      // Do something with the fetched start date and end date
+      //console.log('Start Date:', formatDate(startDate));
+      //console.log('End Date:', formatDate(endDate));
+      
+      // Get the date input elements
+      const startDateInput = document.getElementById('start_date');
+      const endDateInput = document.getElementById('end_date');
+      
+
+      // Update the value of the "Start Date" and "End Date" input elements
+      startDateInput.value = formatDate(startDate);
+      endDateInput.value = formatDate(endDate);
+
+      // Set the min and max attributes of the input elements
+      startDateInput.min = formatDate(startDate);
+      startDateInput.max = formatDate(endDate);
+      endDateInput.min = formatDate(startDate);
+      endDateInput.max = formatDate(endDate);
+    });
+</script>
+
+<!--client-side validation of Form using JavaScript-->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+      const productOfferForm = document.getElementById("productOfferForm");
+      const discountPercentageInput = document.getElementById("discount_percentage");
+      const startDateInput = document.getElementById("start_date");
+      const endDateInput = document.getElementById("end_date");
+
+      productOfferForm.addEventListener("submit", function (event) {
+          if (!validateDiscountPercentage()) {
+              event.preventDefault();
+          }
+          if (!validateStartDate()) {
+              event.preventDefault();
+          }
+          if (!validateEndDate()) {
+              event.preventDefault();
+          }
+      });
+
+      function validateDiscountPercentage() {
+          const discountPercentageError = document.getElementById("discountPercentageError");
+          const discountPercentage = parseInt(discountPercentageInput.value);
+          if (isNaN(discountPercentage) || discountPercentage < 1) {
+              discountPercentageError.textContent = "Discount percentage must be a positive integer.";
+              return false;
+          }
+          discountPercentageError.textContent = "";
+          return true;
+      }
+
+      function validateStartDate() {
+          const startDateError = document.getElementById("startDateError");
+          const startDate = new Date(startDateInput.value);
+          const currentDate = new Date();
+          if (isNaN(startDate.getTime()) || startDate < currentDate) {
+              startDateError.textContent = "Start date must be a future date.";
+              return false;
+          }
+          startDateError.textContent = "";
+          return true;
+      }
+
+      function validateEndDate() {
+          const endDateError = document.getElementById("endDateError");
+          const endDate = new Date(endDateInput.value);
+          const startDate = new Date(startDateInput.value);
+          if (isNaN(endDate.getTime()) || endDate <= startDate) {
+              endDateError.textContent = "End date must be after the start date.";
+              return false;
+          }
+          endDateError.textContent = "";
+          return true;
+      }
+  });
+</script>
+
+<!---client-side validation--->
+<style>
+  .error-message {
+      color: red;
+  }
+</style>
+
+
+
+{% endblock content %} 

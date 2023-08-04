@@ -1,4 +1,5 @@
 
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User	
 
@@ -21,6 +22,7 @@ from django.contrib.auth import authenticate, login, logout
 # OTP Login
 from django.core.mail import send_mail
 from random import randint
+from twilio.rest import Client
 
 # password reset
 from django.contrib.auth.decorators import login_required
@@ -119,6 +121,12 @@ def signin(request):
         if user is not None and user.is_active is True:
             # Authentication successful
             login(request, user)
+
+            # Redirect to the 'next' URL after login
+            next_url = request.GET.get('next')
+            if next_url:
+                return redirect(next_url) 
+
             return redirect('/')
             # return render(request, 'index.html')
         else:

@@ -22,7 +22,7 @@
         <td>{{ product.category }}</td>
         {% comment %} <td>{{ product.unit_of_measurement }}</td> {% endcomment %}
         <td>{{ product.unit_of_measurement.unit }}</td>
-        <td>{{ product.description }}</td>
+        <td>{{ product.description|slice:":69" }}...</td>
         <td>
           {% if product.is_blocked %}
           <a href="#"  class="btn btn-danger disabled" style="background-color: white; color: red;">BLOCKED</a>

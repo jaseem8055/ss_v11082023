@@ -1,0 +1,56 @@
+{% extends 'userprofile/user_base_1.html' %}
+
+{% block content %}
+
+
+    <div class="container user-login-container">
+        <h2 class="mt-4">Send OTP to Phone</h2>
+        <form id="forgotPasswordForm" class="mt-4" method="POST" action="/userprofile/phone-otp/">
+            {% csrf_token %}
+            {% if error_message %}
+            <div class="mt-3 alert alert-danger alert-dismissible fade show" role="alert">                            
+                {{ error_message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endif %}
+            {% if success_message %}
+            <div class="mt-3 alert alert-success alert-dismissible fade show" role="alert">                            
+                {{ success_message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endif %}
+          
+          {% if flag == True %}
+          <div class="mb-3">
+            <label for="otp" class="form-label">OTP:</label>
+            <input type="otp" id="otp" name="otp" class="form-control" required>
+          </div>
+          <button type="submit" class="btn btn-primary" formaction="/userprofile/verify-otp/{{new_contact}}">Verify OTP</button>
+          {% else %}
+          <div class="mb-3">
+            <label for="phone_number" class="form-label">Phone Number:</label>
+            <div class="input-group">
+                <span class="input-group-text">+91</span>
+                <input type="text" id="phone_number" name="phone_number" class="form-control custom-input-width" placeholder="1234567890" required maxlength="10" oninput="this.value = this.value.slice(0, 10)">            
+            </div>
+            {% comment %} <input type="text" id="phone_number" name="phone_number" class="form-control" required>             {% endcomment %}
+          </div>
+          <button type="submit" class="btn btn-primary">Send OTP</button>
+          {% endif %}
+          
+          <div class="mt-3">
+            <a href="/">Back Home</a>
+          </div>
+        </form>
+    </div>
+
+    <style>
+        .custom-input-width {
+            width: 200px;
+        }
+    </style>
+{% endblock content %}  

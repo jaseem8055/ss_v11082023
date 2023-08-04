@@ -1,0 +1,75 @@
+{% extends 'adminpanel/a_base1.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+
+    <h3>Change Delivery Status</h3>
+        <form method="post">        
+            
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="deliveryStatus" class="form-label">Delivery Status:</label>
+                <select id="deliveryStatus" name="delivery_status" class="form-select">
+                    <option value="Pending" {% if order.fulfillment_status == 'Pending' %}selected{% endif %}>Pending</option>
+                    <option value="Processing" {% if order.fulfillment_status == 'Processing' %}selected{% endif %}>Processing</option>
+                    <option value="Shipped" {% if order.fulfillment_status == 'Shipped' %}selected{% endif %}>Shipped</option>
+                    <option value="Delivery Center" {% if order.fulfillment_status == 'Delivery Center' %}selected{% endif %}>Reached Delivery Center</option>
+                    <option value="Delivered" {% if order.fulfillment_status == 'Delivered' %}selected{% endif %}>Delivered</option>
+                    <!-- Add other delivery status options as needed -->
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Delivery Status</button>
+        </form>
+</div>
+
+
+<h2>Order Tracking Status</h2>
+  <table class="tracking-table">
+    <tr>
+        <td>Order Processed</td>
+        <td>{% if track_order.order.created_at %}<span class="green-tick">&#10004;</span>{% endif %}</td>
+        <td>{% if track_order.order.created_at %}{{ track_order.order.created_at }}{% endif %}</td>
+      </tr>
+    <tr>
+      <td>Shipped</td>
+      <td>{% if track_order.shipped_date %}<span class="green-tick">&#10004;</span>{% endif %}</td>
+      <td>{% if track_order.shipped_date %}{{ track_order.shipped_date }}{% endif %}</td>
+    </tr>
+    <tr>
+      <td>Reached Delivery Center</td>
+      <td>{% if track_order.delivery_center_date %}<span class="green-tick">&#10004;</span>{% endif %}</td>
+      <td>{% if track_order.delivery_center_date %}{{ track_order.delivery_center_date }}{% endif %}</td>
+    </tr>
+    <tr>
+      <td>Delivered</td>
+      <td>{% if track_order.delivered_date %}<span class="green-tick">&#10004;</span>{% endif %}</td>
+      <td>{% if track_order.delivered_date %}{{ track_order.delivered_date }}{% endif %}</td>
+    </tr>
+  </table>
+
+  <style>
+    .tracking-table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+  
+    .tracking-table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+  
+    .tracking-table tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+  
+    .green-tick {
+      color: green;
+      font-size: 16px;
+    }
+  </style>
+        
+
+
+{% endblock %}
