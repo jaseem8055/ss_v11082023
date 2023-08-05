@@ -16,6 +16,7 @@ from shop.models import *
 ################
 # PASSWORD RESET
 ################
+@login_required
 def forgot_pass(request):
     logout(request)
     return redirect('/authapp/email_otp/')
@@ -47,7 +48,7 @@ def verify_reset_pass(request):
 
     return render(request, 'userprofile/user_resetpass_prepend.html')
 
-
+@login_required
 def reset_pass(request):
     if request.method == 'POST':
         new_password = request.POST.get('new_password')
@@ -84,6 +85,7 @@ def reset_pass(request):
 def generate_otp():
     return str(randint(100000, 999999))
 
+@login_required
 def send_otp_via_sms(phone_number, otp):
     # Replace these values with your actual Twilio credentials
     account_sid = 'AC6f04adb8fab15476c44fee0b6919fea5'
@@ -100,6 +102,7 @@ def send_otp_via_sms(phone_number, otp):
 
     return message.sid
 
+@login_required
 def send_otp(request):
     flag = False
     msg = None
@@ -118,6 +121,7 @@ def send_otp(request):
         # return HttpResponse('OTP sent successfully!')
     return render(request, 'userprofile/user_mobile_otp.html', {'error_message' : msg, 'flag' : flag})
 
+@login_required
 def verify_otp(request, new_contact):
     flag = True
     msg = f'OTP has been sent to {new_contact}!'
@@ -153,11 +157,14 @@ def verify_otp(request, new_contact):
 #############
 # USER WALLET
 #############
+@login_required
 def my_wallet(request):
     user = request.user
     user_wallet, created = Wallet.objects.get_or_create(user=user)
     context = {'user': user,
                'user_wallet': user_wallet}
+    username = request.user.username
+    context.update({'username': username})
     return render(request, 'userprofile/user_wallet.html', context)
 
 
@@ -166,6 +173,7 @@ def my_wallet(request):
 ##################
 
 # ORDER DETAIL
+@login_required
 def my_order_detail(request, order_id):
     user = request.user
     order = Order.objects.get(pk=order_id)
@@ -181,15 +189,25 @@ def my_order_detail(request, order_id):
             coupon_discount = coupon_obj.coupon.discount
 
     track_order, _ = TrackOrder.objects.get_or_create(user=user, order=order)
-    return render(request, 'userprofile/user_order_detail.html', {'order': order, 'track_order': track_order, 'total': total, 'coupon_code': coupon_code, 'coupon_discount': coupon_discount})
+    context = {}
+    context.update({'order': order, 'track_order': track_order, 'total': total, 'coupon_code': coupon_code, 'coupon_discount': coupon_discount})
+    username = request.user.username
+    context.update({'username': username})
+    return render(request, 'userprofile/user_order_detail.html', context)
 
 # ORDER SUMMARY
+@login_required
 def my_orders(request):
     user = request.user
     orders = Order.objects.filter(user=user).order_by('created_at')
 
-    return render(request, 'userprofile/user_orders.html', {'orders': orders})
+    context = {'orders': orders}
+    username = request.user.username
+    context.update({'username': username})
 
+    return render(request, 'userprofile/user_orders.html', context)
+
+@login_required
 def order_cancellation(request, order_id):
     user = request.user
     if request.method == 'POST':
@@ -232,12 +250,14 @@ def order_refund(request, order_id):
 ####################
 
 # REMOVE ADDRESS
+@login_required
 def remove_address(request, address_pk):
     address = get_object_or_404(Address, pk=address_pk)
     address.delete()
     return redirect('/userprofile/list_address/')
     
 # EDIT ADDRESS
+@login_required
 def edit_address(request, address_pk):
     address = get_object_or_404(Address, pk=address_pk)
     
@@ -280,11 +300,13 @@ def edit_address(request, address_pk):
     context = {
         'address': address,
     }
-
+    username = request.user.username
+    context.update({'username': username})
     return render(request, 'userprofile/user_address_edit.html', context)
 
 
 # LIST ADDRESS
+@login_required
 def list_address(request):
     user_profile = request.user.userprofile
     addresses = Address.objects.filter(user_profile=user_profile)
@@ -295,9 +317,12 @@ def list_address(request):
         'addresses': addresses,
         'default_address': default_address,
     }
+    username = request.user.username
+    context.update({'username': username})
     return render(request, 'userprofile/user_address_list.html', context)
     
 # ADD ADDRESS
+@login_required
 def add_address(request):
     if request.method == 'POST':
         user_profile = request.user.userprofile
@@ -336,8 +361,8 @@ def add_address(request):
                 DefaultAddress.objects.create(user_profile=user_profile, address=address)
 
         return redirect('/userprofile/list_address/')
-
-    return render(request, 'userprofile/user_address_add.html')
+    username = request.user.username    
+    return render(request, 'userprofile/user_address_add.html', {'username': username})
 
 ############
 # MY PROFILE
@@ -403,6 +428,7 @@ def myprofile(request):
         wishlist, _ = Wishlist.objects.get_or_create(user=user)
         # Get the updated count of products in the wishlist for the specific product
         wishlist_count = wishlist.products.count()
-        context.update({'wishlist_count': wishlist_count})        
+        context.update({'wishlist_count': wishlist_count})
+        context.update({'username': username})        
             
     return render(request,'userprofile/user_home.html', context) 

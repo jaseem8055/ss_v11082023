@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 
+
 app_name = 'adminpanel'
 
 urlpatterns = [
@@ -70,6 +71,10 @@ urlpatterns = [
     # Referral Offers
     # path('offers/referral/', views.referral_offers, name='referral_offers'),
     # path('offers/referral/create/', views.create_referral_offer, name='create_referral_offer'),
+
+    # Sales Report
+    path("sales-report/", views.generate_monthly_sales_report_pdf, name="sales-report"),
+    path("sales-report/daily", views.generate_sales_report_pdf, name="sales-report-daily"),
 
 
 

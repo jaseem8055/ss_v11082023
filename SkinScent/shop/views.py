@@ -218,6 +218,9 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from io import BytesIO
 
+from django.db.models.functions import ExtractYear, ExtractMonth
+from django.db.models import Count, F, Sum, Avg
+
 def generate_pdf(request, order_id):
     # Fetch the object from the database
     order_obj = get_object_or_404(Order, id=order_id)
@@ -302,8 +305,6 @@ def generate_pdf(request, order_id):
     response.write(pdf)
 
     return response
-
-
 
 ###################
 # COUPON MANAGEMENT

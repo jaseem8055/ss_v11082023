@@ -33,7 +33,18 @@ from django.utils.dateparse import parse_datetime
 def admin_home(request):
     if request.user.is_authenticated and request.user.is_superuser:        
         adminname = request.user.username
-        return render(request, 'adminpanel/admin_home.html', {'username':adminname})
+
+        distinct_years = Order.objects.dates('created_at', 'year', order='DESC').distinct()
+        distinct_months = Order.objects.dates('created_at', 'month', order='DESC').distinct()
+
+        context = {
+            'distinct_years': distinct_years,
+            'distinct_months': distinct_months
+        }
+
+        context.update({'username':adminname})
+        
+        return render(request, 'adminpanel/admin_home.html', context)
     else:
         logout(request)
         return redirect('/adminpanel/admin_signin/')
@@ -65,6 +76,168 @@ def admin_logout(request):
     return redirect('/adminpanel/')
 
 
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Paragraph
+
+from io import BytesIO
+
+from django.db.models import Sum
+from reportlab.lib.styles import getSampleStyleSheet
+
+import calendar
+from reportlab.platypus.doctemplate import PageBreak
+
+# Yearly Sales Report - NOT USED
+def generate_monthly_sales_report_pdf(request, year=None):
+    from datetime import datetime    
+    # If year is not provided, use the current year
+    if year is None:
+        year = datetime.now().year
+
+    # Query to retrieve monthly sales data
+    monthly_sales = Order.objects.annotate(month=ExtractMonth('created_at'))\
+        .filter(created_at__year=year)\
+        .values('month')\
+        .annotate(total_sales=Sum('sub_total'))\
+        .order_by('month')
+
+    # Create a response object with PDF content type
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="monthly_sales_report_{year}.pdf"'
+
+    # Create a buffer for the PDF content
+    buffer = BytesIO()
+
+    # Create a PDF document using reportlab
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    elements = []
+
+    # Title Font
+    title_font_style = getSampleStyleSheet()["Title"]
+    title_text = f"Monthly Sales Report - {year}"
+    elements.append(Paragraph(title_text, title_font_style))
+    elements.append(Paragraph("<br/><br/>", title_font_style))  # Add some space after the title
+
+    # Body Font
+    normal_font_style = getSampleStyleSheet()["Normal"]
+
+    # Add content to the PDF with proper formatting
+    for entry in monthly_sales:
+        month_number = entry['month']
+        month_name = calendar.month_name[month_number]
+        total_sales = entry['total_sales']
+        elements.append(Paragraph(f"{month_name}: {total_sales}", normal_font_style))
+
+    # Build the PDF
+    doc.build(elements)
+    pdf = buffer.getvalue()
+    buffer.close()
+    response.write(pdf)
+
+    return response
+
+# Daily Sales Report
+def generate_sales_report_pdf(request, year=None, month=None):
+    from datetime import datetime
+
+    # GET from Sales Report Form at "admin_home.html"
+    year = int(request.GET.get('year'))
+    month = int(request.GET.get('month'))   
+        
+    # If year and month are not provided, use the current year and month
+    if year is None:
+        year = datetime.now().year
+    if month is None:
+        month = datetime.now().month
+        
+
+    # Query to retrieve monthly sales data
+    monthly_sales = Order.objects.annotate(year=ExtractYear('created_at'),
+                                           month=ExtractMonth('created_at'))\
+        .filter(created_at__year=year, created_at__month=month)\
+        .values('year', 'month')\
+        .annotate(total_sales=Sum('sub_total'))\
+        .order_by('year', 'month')
+
+    # Query to retrieve daily sales data within the specified month
+    daily_sales = Order.objects.annotate(year=ExtractYear('created_at'),
+                                         month=ExtractMonth('created_at'),
+                                         day=ExtractDay('created_at'))\
+        .filter(created_at__year=year, created_at__month=month)\
+        .values('year', 'month', 'day')\
+        .annotate(total_sales=Sum('sub_total'))\
+        .order_by('year', 'month', 'day')
+    
+    # Query to retrieve individual orders for the specified month and year
+    orders = Order.objects.filter(created_at__year=year, created_at__month=month)
+
+
+    # Create a response object with PDF content type
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="sales_report_{year}_{month}.pdf"'
+
+    # Create a buffer for the PDF content
+    buffer = BytesIO()
+
+    # Create a PDF document using reportlab
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    elements = []
+
+    # Title Font
+    title_font_style = getSampleStyleSheet()["Title"]
+    title_text = f"Sales Report - {calendar.month_name[month]} {year}"
+    elements.append(Paragraph(title_text, title_font_style))
+    # elements.append(Paragraph("<br/><br/>", title_font_style))  # Add some space after the title
+
+    # Sub-Title
+    # Define a style for sub-titles
+    subtitle_font_style = getSampleStyleSheet()["Heading2"]
+    # subtitle_font_style.alignment = 1  # Center alignment
+    subtitle_font_style.fontSize = 12
+    subtitle_font_style.leading = 20
+
+    # Body Font
+    normal_font_style = getSampleStyleSheet()["Normal"]
+
+    # Add monthly sales content to the PDF
+    elements.append(Paragraph("Monthly Sales:", subtitle_font_style))
+    for entry in monthly_sales:
+        total_sales = entry['total_sales']
+        elements.append(Paragraph(f"Total Sales: {total_sales}", normal_font_style))
+
+    # Add a page break to separate monthly and daily sales
+    #elements.append(PageBreak())
+
+    # Add space between monthly and daily sales sections
+    elements.extend([Paragraph("<br/><br/>", normal_font_style) for _ in range(3)])  # Add 3 empty lines
+
+
+    # Add daily sales content to the PDF
+    elements.append(Paragraph("Daily Sales:", subtitle_font_style))
+    for entry in daily_sales:
+        day = entry['day']
+        total_sales = entry['total_sales']
+        elements.append(Paragraph(f"Day {day}: Total Sales: {total_sales}", normal_font_style))
+
+    # Add space before the Order Summary section
+    elements.extend([Paragraph("<br/><br/>", normal_font_style) for _ in range(3)])  # Add 3 empty lines
+
+    # Add Order Summary section
+    elements.append(Paragraph("Order Summary:", subtitle_font_style))
+    for order in orders:
+        elements.append(Paragraph(f"Order Number: {order.order_number}", normal_font_style))
+        elements.append(Paragraph(f"Shipping Address: {order.shipping_address}", normal_font_style))
+        elements.append(Paragraph(f"Total Amount: {order.sub_total}", normal_font_style))
+        elements.append(Paragraph("--------------<br/>", normal_font_style))
+
+    # Build the PDF
+    doc.build(elements)
+    pdf = buffer.getvalue()
+    buffer.close()
+    response.write(pdf)
+
+    return response
+
 ####################################################
 ####################### OFFERS #####################
 ####################################################
@@ -90,8 +263,7 @@ def edit_offer(request, offer_id):
          # Check if start_date is after end_date
         if start_date > end_date:
             error_message = " 'Start Date' cannot be after 'End Date' "
-            messages.error(request, error_message)   
-            print("Messages content:", request._messages.__dict__)                
+            messages.error(request, error_message)               
             return redirect('adminpanel:edit_offer', offer_id=offer_id)
 
         # Check if there's an active offer with the same name
@@ -146,6 +318,13 @@ def create_offer(request):
     return render(request, 'adminpanel/a_offer_create.html')
 
 def offers(request):
+    adminname = None
+    if request.user.is_authenticated:
+        if request.user.is_superuser:
+            adminname = request.user.username
+        else:
+            return redirect('adminpanel:admin_home')
+    
     current_datetime = timezone.now()
 
     existing_offers = Offer.objects.filter(start_date__lte=current_datetime, end_date__gte=current_datetime, active=True)
@@ -227,6 +406,12 @@ def create_product_offer(request):
 from datetime import timedelta
 
 def product_offers(request):
+    adminname = None
+    if request.user.is_authenticated:
+        if request.user.is_superuser:
+            adminname = request.user.username
+        else:
+            return redirect('adminpanel:admin_home')
 
     # UTC to IST difference
     hours_to_add = 5
@@ -370,7 +555,7 @@ def edit_product_offer(request, pk):
 #######
 from django.http import JsonResponse
 from django.db.models import Count
-from django.db.models.functions import ExtractYear, ExtractMonth
+from django.db.models.functions import ExtractYear, ExtractMonth, ExtractDay
 from django.db.models import Count, F, Sum, Avg
 from utils.charts import months, colorPrimary, colorSuccess, colorDanger, generate_color_palette, get_year_dict, get_user_dict
 
@@ -658,6 +843,13 @@ def order_detail(request, order_id):
     return render(request, 'adminpanel/a_order_detail.html', context)
 
 def order_summary(request):
+    adminname = None
+    if request.user.is_authenticated:
+        if request.user.is_superuser:
+            adminname = request.user.username
+        else:
+            return redirect('adminpanel:admin_home')
+    
     orders = Order.objects.all()
     context = {'orders': orders}
     return render(request, 'adminpanel/a_orders_summary.html', context)
@@ -668,6 +860,13 @@ def order_summary(request):
 #### USERS MANAGEMENT ####
 ##########################
 def list_user(request):
+    adminname = None
+    if request.user.is_authenticated:
+        if request.user.is_superuser:
+            adminname = request.user.username
+        else:
+            return redirect('adminpanel:admin_home')
+    
     if request.user.is_authenticated:
         if request.user.is_superuser:
             adminname = request.user.username
@@ -759,7 +958,10 @@ def list_variant(request, product_id):
 def start_product_variant(request):
     adminname = None
     if request.user.is_authenticated:
-        adminname = request.user.username
+        if request.user.is_superuser:
+            adminname = request.user.username
+        else:
+            return redirect('adminpanel:admin_home')
     
     products = Product.objects.all().order_by('pk')
     paginator = Paginator(products, 10)  # Display 10 categories per page
@@ -770,16 +972,16 @@ def start_product_variant(request):
     return render(request, 'adminpanel/a_variant_products.html', {'products': products, 'username':adminname})
 
 
-
-
-
 ##########################
 ### PRODUCT MANAGEMENT ###
 ##########################
-def list_product(request):
+def list_product(request):    
     adminname = None
     if request.user.is_authenticated:
-        adminname = request.user.username
+        if request.user.is_superuser:
+            adminname = request.user.username
+        else:
+            return redirect('adminpanel:admin_home')
     
     products = Product.objects.all().order_by('pk')
     paginator = Paginator(products, 10)  # Display 10 categories per page
@@ -919,7 +1121,10 @@ def block_product(request, product_id):
 def list_category(request):
     adminname = None
     if request.user.is_authenticated:
-        adminname = request.user.username
+        if request.user.is_superuser:
+            adminname = request.user.username
+        else:
+            return redirect('adminpanel:admin_home')
 
     all_categories = Category.objects.all().order_by('name')
     paginator = Paginator(all_categories, 10)  # Display 10 categories per page
@@ -981,7 +1186,6 @@ def add_category(request):
     
     return render(request, 'adminpanel/a_category_add.html', {'username':adminname})
 
-
 def edit_category(request, category_id):
     cat_update = Category.objects.get(id=category_id)
     adminname = None
@@ -1025,7 +1229,6 @@ def edit_category(request, category_id):
         return redirect('/adminpanel/list_cat/')    
        
     return render(request, 'adminpanel/a_category_edit.html', {'username':adminname, 'category':cat_update})
-
 
 def block_category(request, category_id):
     if request.method == 'POST':
