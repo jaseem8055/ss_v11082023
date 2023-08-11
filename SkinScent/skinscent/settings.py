@@ -94,8 +94,8 @@ WSGI_APPLICATION = 'skinscent.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        # 'NAME': 'test3',
-        'NAME': 'empty_4_ss',
+        'NAME': 'test3',
+        # 'NAME': 'empty_4_ss',
         'USER': 'postgres',
         'PASSWORD': '28081988',
         'HOST': 'localhost',
