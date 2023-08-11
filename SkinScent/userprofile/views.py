@@ -85,7 +85,6 @@ def reset_pass(request):
 def generate_otp():
     return str(randint(100000, 999999))
 
-@login_required
 def send_otp_via_sms(phone_number, otp):
     # Replace these values with your actual Twilio credentials
     account_sid = 'AC6f04adb8fab15476c44fee0b6919fea5'
@@ -408,9 +407,10 @@ def myprofile(request):
         pass
     
     try:                
-        default_address = DefaultAddress.objects.filter(user_profile=user_profile).first()        
+        default_address = DefaultAddress.objects.filter(user_profile=user_profile).first()
 
-        display_default_address = f'{default_address.address.addressee}, {default_address.address.address_line1}, {default_address.address.street}, {default_address.address.city}, {default_address.address.state}, {default_address.address.country}, PINCODE:{default_address.address.pin_code} '
+        if default_address is not None:
+            display_default_address = f'{default_address.address.addressee}, {default_address.address.address_line1}, {default_address.address.street}, {default_address.address.city}, {default_address.address.state}, {default_address.address.country}, PINCODE:{default_address.address.pin_code} '
         
         context.update({'display_default_address': display_default_address})
         # print(context)

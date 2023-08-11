@@ -1,5 +1,51 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h6>Contact Us</h6>                    
-{% endblock content %}  
+
+<div class="container p-1">
+    <h3>Contact Us</h3>
+    <form id="contact-form">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="email" class="form-label">Your Email:</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+        <div class="mb-3">
+            <label for="message" class="form-label">Message:</label>
+            <textarea class="form-control" id="message" name="message" required></textarea>
+        </div>
+        <button type="button" class="btn btn-primary" id="submit-btn">Send</button>
+    </form>
+</div>
+
+<!-- Display a message for the user -->
+<div id="message-container"></div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const form = document.getElementById("contact-form");
+        const submitBtn = document.getElementById("submit-btn");
+        const messageContainer = document.getElementById("message-container");
+
+        submitBtn.addEventListener("click", function() {
+            const formData = new FormData(form);
+            const xhr = new XMLHttpRequest();
+
+            xhr.open("POST", "{% url 'shop:contact' %}", true);
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        const response = JSON.parse(xhr.responseText);
+                        messageContainer.innerHTML = response.message;
+                    } else {
+                        messageContainer.innerHTML = "An error occurred.";
+                    }
+                }
+            };
+
+            xhr.send(formData);
+        });
+    });
+</script>
+{% endblock content %}

@@ -1,11 +1,12 @@
 from django.urls import path
 from . import views
+from authapp.views import contact_us
 
 app_name = 'shop'
 
 urlpatterns = [    
     path('', views.home, name='home'),
-    path('contact/', views.contact, name='contact'),
+    path('contact/', contact_us, name='contact'),
 
     # User Shop Page
     path('category_page/<int:category_id>/', views.category_page, name='category_page'),

@@ -26,37 +26,7 @@
                 <div class="mb-4">
                     <h4 class="font-weight-semi-bold mb-4">Shipping Address</h4>
                     <div class="row">
-                        <!---ADDRESS CARD-->    
-                        {% comment %} <div class="col-md-6 form-group">
-                            <label for="addressee">Addressee</label>
-                            <input class="form-control" type="text" name="addressee" value="{{ addressee }}" placeholder="123 Street">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label for="address_line1">Address Line 1</label>
-                            <input class="form-control" type="text" name="address_line1" value="{{ address_line1 }}" placeholder="123 Street">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label for="address_line2">Address Line 2</label>
-                            <input class="form-control" type="text" name="address_street" value="{{ address_street }}" placeholder="123 Street">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label for="city">City</label>
-                            <input class="form-control" type="text" name="city" value="{{ address_city }}" placeholder="New York">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label for="state">State</label>
-                            <input class="form-control" type="text" name="state" value="{{ address_state }}" placeholder="New York">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label for="country">Country</label>
-                            <input class="form-control" type="text" name="country" value="{{ address_country }}" placeholder="New York">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label for="zip_code">ZIP Code</label>
-                            <input class="form-control" type="text" name="zip_code" value="{{ address_pincode }}" placeholder="123">
-                        </div>                 {% endcomment %}
-                        
-                        
+                        <!---ADDRESS CARD-->
                         <div class="col-md-6 form-group">
                             <label for="addressee">Addressee</label>
                             <input class="form-control" type="text" name="addressee" id="addressee" placeholder="addressee" required>
@@ -91,65 +61,6 @@
                 <div class="collapse mb-4" id="shipping-address">
                     <h4 class="font-weight-semi-bold mb-4">Shipping Address</h4>
                     <div class="row">
-                        <!---DEFAULT ONLY-->
-                        {% comment %} <div class="col-md-6 form-group">
-                            <label for="addressee">Addressee</label>
-                            <input class="form-control" type="text" name="addressee" value="{{ addressee }}" placeholder="123 Street">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label for="address_line1">Address Line 1</label>
-                            <input class="form-control" type="text" name="address_line1" value="{{ address_line1 }}" placeholder="123 Street">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label for="address_line2">Address Line 2</label>
-                            <input class="form-control" type="text" name="address_street" value="{{ address_street }}" placeholder="123 Street">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label for="city">City</label>
-                            <input class="form-control" type="text" name="city" value="{{ address_city }}" placeholder="New York">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label for="state">State</label>
-                            <input class="form-control" type="text" name="state" value="{{ address_state }}" placeholder="New York">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label for="country">Country</label>
-                            <input class="form-control" type="text" name="country" value="{{ address_country }}" placeholder="New York">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label for="zip_code">ZIP Code</label>
-                            <input class="form-control" type="text" name="zip_code" value="{{ address_pincode }}" placeholder="123">
-                        </div>                        {% endcomment %}
-                        <!---DEFAULT ONLY-->
-
-                        {% comment %} <div class="col-md-6 form-group">
-                            <label for="addressee">Addressee</label>
-                            <input class="form-control" type="text" name="addressee_md" id="addressee_md" placeholder="addressee" required>
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label for="address_line1">Address Line 1</label>
-                            <input class="form-control" type="text" name="address_line1_md" id="address_line1_md" placeholder="123 Street" required>
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label for="address_street">Address Line 2</label>
-                            <input class="form-control" type="text" name="address_street_md" id="address_street_md" placeholder="123 Street" required>
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label for="city">City</label>
-                            <input class="form-control" type="text" name="city_md" id="city_md" placeholder="City" required>
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label for="state">State</label>
-                            <input class="form-control" type="text" name="state_md" id="state_md" placeholder="state" required>
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label for="country">Country</label>
-                            <input class="form-control" type="text" name="country_md" id="country_md" placeholder="Country" required>
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label for="zip_code">ZIP Code</label>
-                            <input class="form-control" type="text" name="zip_code_md" id="zip_code_md" placeholder="123" required>
-                        </div> {% endcomment %}
                     </div>
                 </div>
                 <!---CHANGE ADDRESS-->
@@ -179,8 +90,13 @@
                         <h5 class="font-weight-medium mb-3">Products</h5>
                         {% for cart_item in cart_items %}
                         <div class="d-flex justify-content-between">
-                            <p>{{ cart_item.product.name }} {{ cart_item.get_variant_value }}{{ cart_item.product.unit_of_measurement.unit }} x {{ cart_item.quantity }}</p>
-                            <pre>  </pre><p>₹{{ cart_item.get_item_total }}</p>
+                            {% if cart_item.new_price is not None and cart_item.new_price > 0.00 %}
+                                <p>{{ cart_item.product.name }} {{ cart_item.get_variant_value }}{{ cart_item.product.unit_of_measurement.unit }} x {{ cart_item.quantity }}</p>
+                                <pre>  </pre><p>₹{{ cart_item.get_item_total_new }}</p>
+                            {% else %}
+                                <p>{{ cart_item.product.name }} {{ cart_item.get_variant_value }}{{ cart_item.product.unit_of_measurement.unit }} x {{ cart_item.quantity }}</p>
+                                <pre>  </pre><p>₹{{ cart_item.get_item_total }}</p>
+                            {% endif %}
                         </div>
                         {% endfor %}
                         
@@ -245,68 +161,11 @@
 <!-- Checkout End -->
 
 
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<script>
-    $(document).ready(function() {        
-        $('#ship_to_address').click(function(event) {
-            event.preventDefault();
-            //console.log("Clicked")
-    
-            var selectedAddressId = $('#change_address').val();
-            //console.log("AddressId =",selectedAddressId )
-            
-            if (selectedAddressId !== '') {
-                $.ajax({
-                    url: '/get-address/',
-                    method: 'GET',
-                    data: { address_id: selectedAddressId },
-                    success: function(response) {
-                        updateAddressFields(response);
-                    },
-                    error: function() {
-                        console.log('Error retrieving address details.');
-                    }
-                });
-            }
-        });
-    
-        function updateAddressFields(address) {
-            console.log('Recieved Address Data');
-            $('#addressee').val(address.addressee);
-            $('#address_line1').val(address.address_line1);
-            $('#address_street').val(address.street);
-            $('#city').val(address.city);
-            $('#state').val(address.state);
-            $('#country').val(address.country);
-            $('#zip_code').val(address.pin_code);
-        }
-    });    
-</script>
-
-<!---TOGGLE PLACE ORDER BUTTON FOR COD & RAZORPAY--->
-<script>
-    function toggleButtons() {
-        var codRadio = document.getElementById("cod");
-        var razorpayRadio = document.getElementById("razorpay");        
-        var placeOrderButton = document.getElementById("placeOrderButton");
-        var razorpayButton = document.getElementById("rzp-button1");
-      
-        if (razorpayRadio.checked) {
-          placeOrderButton.style.display = "none";
-          razorpayButton.style.display = "block";
-        } 
-        else {
-          placeOrderButton.style.display = "block";
-          razorpayButton.style.display = "none";
-        }
-      }
-</script>
-
-
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
 <script>
+    
     function saveOrder() {
         event.preventDefault();        
         // Get input field values
@@ -346,13 +205,13 @@
             dataType: 'json',
             success: function(response) {
                 // Handle the success response (if needed)
-                console.log("Order data saved successfully!");
+                //console.log("Order data saved successfully!");
                 // After saving, trigger the Razorpay payment flow
                 initiateRazorpayPayment(response);
             },
             error: function(xhr, status, error) {
                 // Handle the error if any
-                console.log(xhr.responseText);
+                //console.log(xhr.responseText);
                 try {
                     var alert_msg = JSON.parse(xhr.responseText);
                     alert(alert_msg.error);                    
@@ -365,7 +224,7 @@
     }
 
     function initiateRazorpayPayment(response) {        
-        console.log("Initiated Razorpay!");
+        //console.log("Initiated Razorpay!");
         var options = {
             "key": response.key, // Use the key from the response data
             "amount": response.amount,
@@ -408,7 +267,7 @@
     }
 
     function handlePaymentSuccess(response) {
-        console.log("Initiated handlePaymentSuccess!");
+        //console.log("Initiated handlePaymentSuccess!");
         // Extract the required data from the response
         var payment_id = response.razorpay_payment_id;
         var order_id = response.razorpay_order_id;
@@ -435,66 +294,79 @@
                     var order_id = response.order_id;
                     window.location.href = "/order_success/"+ order_id + "/";
                     //window.location.href = "/order_success/${order_id}/";
-                    console.log("Payment successful! Placed Order successfully!");
+                    //console.log("Payment successful! Placed Order successfully!");
                 } else {
-                    console.log("Payment processing error:", response.message);
+                    //console.log("Payment processing error:", response.message);
                 }
             },
             error: function (xhr, status, error) {
                 // Handle the error if any
-                console.log("Error:", xhr.responseText);
+                //console.log("Error:", xhr.responseText);
             }
         });
     }
-</script>
 
-    
+</script>
 
 
 
 <script>
-var options = {
-    "key": "{{ key_id }}", // Enter the Key ID generated from the Dashboard
-    "amount": "{{ amount }}", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
-    "currency": "INR",
-    "name": "Acme Corp",
-    "description": "Test Transaction",
-    "image": "https://example.com/your_logo",
-    "order_id": "{{ order_id }}", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-    "handler": function (response){
-        alert(response.razorpay_payment_id);
-        alert(response.razorpay_order_id);
-        alert(response.razorpay_signature)
-    },
-    "prefill": {
-        "name": "Gaurav Kumar",
-        "email": "gaurav.kumar@example.com",
-        "contact": "9000090000"
-    },
-    "notes": {
-        "address": "Razorpay Corporate Office"
-    },
-    "theme": {
-        "color": "#3399cc"
-    }
-};
-var rzp1 = new Razorpay(options);
-rzp1.on('payment.failed', function (response){
-        alert(response.error.code);
-        alert(response.error.description);
-        alert(response.error.source);
-        alert(response.error.step);
-        alert(response.error.reason);
-        alert(response.error.metadata.order_id);
-        alert(response.error.metadata.payment_id);
-});
-/*
-document.getElementById('rzp-button1').onclick = function(e){
-    rzp1.open();
-    e.preventDefault();
-}
-*/
-</script>  
+    $(document).ready(function() {        
+        $('#ship_to_address').click(function(event) {
+            event.preventDefault();
+            //console.log("Clicked")
+    
+            var selectedAddressId = $('#change_address').val();
+            //console.log("AddressId =",selectedAddressId )
+            
+            if (selectedAddressId !== '') {
+                $.ajax({
+                    url: '/get-address/',
+                    method: 'GET',
+                    data: { address_id: selectedAddressId },
+                    success: function(response) {
+                        updateAddressFields(response);
+                    },
+                    error: function() {
+                        //console.log('Error retrieving address details.');
+                    }
+                });
+            }
+        });
+    
+        function updateAddressFields(address) {
+            //console.log('Recieved Address Data');
+            $('#addressee').val(address.addressee);
+            $('#address_line1').val(address.address_line1);
+            $('#address_street').val(address.street);
+            $('#city').val(address.city);
+            $('#state').val(address.state);
+            $('#country').val(address.country);
+            $('#zip_code').val(address.pin_code);
+        }
+    });    
+</script>
 
+<!---TOGGLE PLACE ORDER BUTTON FOR COD & RAZORPAY--->
+<script>
+    function toggleButtons() {
+        var codRadio = document.getElementById("cod");
+        var razorpayRadio = document.getElementById("razorpay");        
+        var placeOrderButton = document.getElementById("placeOrderButton");
+        var razorpayButton = document.getElementById("rzp-button1");
+      
+        if (razorpayRadio.checked) {
+          placeOrderButton.style.display = "none";
+          razorpayButton.style.display = "block";
+        } 
+        else {
+          placeOrderButton.style.display = "block";
+          razorpayButton.style.display = "none";
+        }
+      }
+</script>
+
+
+  
 
 {% endblock content %} 

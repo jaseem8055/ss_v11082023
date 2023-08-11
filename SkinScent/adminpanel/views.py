@@ -76,6 +76,9 @@ def admin_logout(request):
     return redirect('/adminpanel/')
 
 
+################
+# SALES REPORT #
+################
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph
 
@@ -821,10 +824,17 @@ def change_payment_status(request, order_id):
         }
 
     if order.payment_method != 'COD' and order.fulfillment_status != 'Cancelled':        
-        razor_payment = get_object_or_404(RazorPayment, order_id=order_id)
-        context = {'order': order, 
-                   'razor_payment': razor_payment,
-                   }
+        try:
+            razor_payment = RazorPayment.objects.get(order_id=order_id)
+            context = {'order': order, 
+                    'razor_payment': razor_payment,
+                    }
+        except RazorPayment.DoesNotExist:
+            # Some Conflict Occured and failed to create Object for the Order in Razorpayment Model.
+            # The case to be handled by DB Manager
+            msg = "Data Error: Contact Database Manager for Order with ID: " + str(order_id) + " & " + " Order No." + order.order_number
+            go_url = "/adminpanel/order_detail/" + str(order_id) + "/"
+            return render(request, 'page404.html', {'message': msg, 'go_url': go_url}) 
 
     if request.method == 'POST':
         new_payment_status = request.POST.get('payment_status')
@@ -1141,10 +1151,18 @@ def add_category(request):
     if request.method == 'POST':
         category_name = request.POST['category_name']
         description = request.POST['description']
-
         # Handle uploaded images
         image = request.FILES.get('category_image')
         
+        # Check if any required fields are empty
+        if not category_name or not description or not image:
+            context = {
+                'error_message': "All fields are required.",
+                'username': adminname
+            }
+            return render(request, 'adminpanel/a_category_add.html', context)
+
+
         # Prevent ERROR through for Unique Constraint for 'name'        
         has_product = Category.objects.filter(name=category_name).exists()
         
@@ -1164,7 +1182,6 @@ def add_category(request):
         if slug_obj.exists():
             # If the slug already exists, append a unique identifier to the slug
             slug_new = f"{slug_new}-{slug_obj.count() + 1}"            
-
         
         try:
             # Create a new Category object
@@ -1175,12 +1192,6 @@ def add_category(request):
             # You can choose to retry with a different slug or handle the error as per your application's logic
             # In this example, let's raise an exception to indicate the error
             raise IntegrityError("Failed to create category due to slug conflict. Please Use different Category Name.")
-        
-
-        # # Create a new Category object
-        # category = Category(name=category_name, slug=slug_new, description=description)
-        # category.save()
-        
         # Redirect to a success page or another view
         return redirect('/adminpanel/list_cat/')
     

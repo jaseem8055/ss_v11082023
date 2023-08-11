@@ -18,18 +18,16 @@
         {% endif %}     
     <div class="mb-3">
         <label for="username" class="form-label">Username:</label>
-        <input type="text" id="username" name="username" class="form-control" required>
+        <input type="text" id="username" name="username" class="form-control" required autocomplete="current-name">
     </div>
     <div class="mb-3">
         <label for="password" class="form-label">Password:</label>
-        <input type="password" id="password" name="password" class="form-control" required>
+        <input type="password" id="password" name="password" class="form-control" required autocomplete="current-password">
     </div>
     <button type="submit" class="btn btn-primary">Sign In</button>
     <div class="mt-3">        
-        {% comment %} <a href="/email_otp_login" class="me-2">Forgot Password?</a> {% endcomment %}
         <a href="/authapp/email_otp/" class="me-2">Forgot Password?</a>
         <span>|</span>        
-        {% comment %} <a href="{% url 'authapp:signup' %}" class="ms-2">Sign Up</a> {% endcomment %}
         <a href="/authapp/signup/" class="ms-2">Sign Up</a>
     </div>
     </form>

@@ -7,7 +7,7 @@
       <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
           <h1 class="font-weight-semi-bold text-uppercase mb-3">Product Detail</h1>
           <div class="d-inline-flex">
-              <p class="m-0"><a href="">Home</a></p>
+              <p class="m-0"><a href="/">Home</a></p>
               <p class="m-0 px-2">-</p>
               <p class="m-0">Product Detail</p>
           </div>
@@ -18,7 +18,7 @@
   <!-- Menubar -->
   <div class="col-lg-12">
     <nav class="navbar navbar-expand-lg bg-light navbar-light py-3 py-lg-0 px-0">
-        <a href="" class="text-decoration-none d-block d-lg-none">
+        <a href="/" class="text-decoration-none d-block d-lg-none">
             <h1 class="m-0 display-5 font-weight-semi-bold"><span class="text-primary font-weight-bold border px-3 mr-1">Skin&nbsp;&amp;&nbsp;Scent</span></h1>
         </a>
         <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
@@ -27,36 +27,22 @@
         <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
             <div class="navbar-nav mr-auto py-0">
                 <a href="/" class="nav-item nav-link active">Home</a>
-                {% comment %} <a href="shop.html" class="nav-item nav-link">Shop</a> {% endcomment %}
-                <a href="/" class="nav-item nav-link">Shop</a>
-                {% comment %} <a href="detail.html" class="nav-item nav-link">Shop Detail</a> {% endcomment %}
-                <a href="/" class="nav-item nav-link">Shop Detail</a>
-                <div class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Pages</a>
-                    <div class="dropdown-menu rounded-0 m-0">
-                        {% comment %} <a href="cart.html" class="dropdown-item">Shopping Cart</a> {% endcomment %}
-                        <a href="/" class="dropdown-item">Shopping Cart</a>
-                        {% comment %} <a href="checkout.html" class="dropdown-item">Checkout</a> {% endcomment %}
-                        <a href="/" class="dropdown-item">Checkout</a>
-                    </div>
-                </div>
-                {% comment %} <a href="contact.html" class="nav-item nav-link">Contact</a> {% endcomment %}
-                <a href="/contact" class="nav-item nav-link">Contact</a>
+                <a href="/search-products/" class="nav-item nav-link">Shop</a>
+                <a href="/contact/" class="nav-item nav-link">Contact</a>
             </div>
             <div class="navbar-nav ml-auto py-0">
                 {% if username != None %}
-                {% comment %} <a href="#" class="nav-item nav-link">{{username}}</a> {% endcomment %}
                 <div class="nav-item dropdown">
                     <a href="#" class="nav-link" data-toggle="dropdown">{{username}}<i class="fa fa-angle-down float-right mt-1"></i></a>
                     <div class="dropdown-menu position-absolute bg-secondary border-0 rounded-0 w-100 m-0">
-                        <a href="" class="dropdown-item">Profile Settings</a>
+                        <a href="/userprofile/" class="dropdown-item">Profile Settings</a>
                         <a href="/authapp/signout/" class="dropdown-item">Logout</a>                                    
                     </div>
                 </div>
                 {% else %}
                 <a href="/authapp/signin/" class="nav-item nav-link">Login</a>
-                {% endif %}
                 <a href="/authapp/signup/" class="nav-item nav-link">Register</a>
+                {% endif %}
             </div>
         </div>
     </nav>
@@ -238,7 +224,6 @@
         <div class="col">
             <div class="nav nav-tabs justify-content-center border-secondary mb-4">
                 <a class="nav-item nav-link active" data-toggle="tab" href="#tab-pane-1">Description</a>
-                {% comment %} <a class="nav-item nav-link" data-toggle="tab" href="#tab-pane-2">Information</a> {% endcomment %}
                 <a class="nav-item nav-link" data-toggle="tab" href="#tab-pane-3">Reviews (0)</a>
             </div>
             <div class="tab-content">
@@ -344,36 +329,6 @@
 </div>
 <!-- Shop Detail End -->
 
-
-{% comment %} <div class="col-lg-5 pb-5">
-    <div id="product-carousel" class="carousel slide" data-ride="carousel">
-      <div class="carousel-inner border">
-        {% for image in images_list %}
-        <div class="carousel-item {% if forloop.first %}active{% endif %}">
-          <img class="w-100 h-100" src="{{ image.image.url }}" alt="Image" onclick="changeMainImage(this.src)">
-        </div>
-        {% endfor %}
-        
-      </div>
-      <a class="carousel-control-prev" href="#product-carousel" data-slide="prev">
-        <i class="fa fa-2x fa-angle-left text-dark"></i>
-      </a>
-      <a class="carousel-control-next" href="#product-carousel" data-slide="next">
-        <i class="fa fa-2x fa-angle-right text-dark"></i>
-      </a>
-    </div>
-</div> {% endcomment %}
-
-{% comment %} <div class="product-details">    
-    <div class="product-info">
-      <h2>Product Name</h2>
-      <p><strong>Price:</strong> $19.99</p>
-      <p><strong>Description:</strong> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed aliquet semper justo at gravida.</p>
-      <p><strong>Availability:</strong> In stock</p>
-      <p><strong>SKU:</strong> ABC123</p>
-      <p><strong>Manufacturer:</strong> Company Name</p>
-    </div>
-  </div> {% endcomment %}
 
 <script>
   window.onload = function() {

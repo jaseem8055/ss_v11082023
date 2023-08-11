@@ -1,10 +1,17 @@
 {% extends 'userprofile/user_base_1.html' %}
 {% block content %}
-<h2>Address List</h2>
+<div class="container p-1">
+    <h2>Address List</h2>
+        <br>
+        <div class="container mt=3 mb=3">
+            <a href="/userprofile/add_address/" class="btn btn-primary">Add New Address</a>
+        </div>
+        <br>
+</div>
 
 {% if default_address %}
 
-<div class="container">
+<div class="container mb-3">
     <div class="row">
         <div class="col-lg-6">            
                 <!---DEFAULT ADDRESS-->
@@ -22,16 +29,11 @@
                 </div>
                 {% endif %}
                 <!---DEFAULT ADDRESS-->           
-        </div>
+        </div>        
     </div>
-    
 </div>
 
-<br>
-<div class="container mt=3 mb=3">
-    <a href="/userprofile/add_address/" class="btn btn-primary">Add New Address</a>
-</div>
-<br>
+
 
 <div class="container">
     <div class="row">

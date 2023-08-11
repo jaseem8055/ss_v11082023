@@ -1,3 +1,5 @@
+from django.core.exceptions import ObjectDoesNotExist
+
 import datetime
 
 # For Fixing the Time Zone from UTC
@@ -54,17 +56,20 @@ def home(request):
     # Calculate the timedelta with the specified hours and minutes
     time_delta = timedelta(hours=hours_to_add, minutes=minutes_to_add)
     IST_local = timezone.now() + time_delta
-    # Get all active offers
-    active_offers_exists = Offer.objects.filter(active=True, end_date__gt=IST_local, start_date__lte=IST_local).exists()
+    try:
+        # Get all active offers
+        active_offers_exists = Offer.objects.filter(active=True, end_date__gt=IST_local, start_date__lte=IST_local).exists()
     
-    if active_offers_exists:
-        active_offers = Offer.objects.filter(active=True, end_date__gt=IST_local, start_date__lte=IST_local)
-        # Fetch product offers for each active offer            
-        for offer in active_offers:
-            product_offers = ProductOffer.objects.filter(offer=offer, active=True)
-            offer_products_count += product_offers.count()
-        
-    context.update({ 'offer_products_count': offer_products_count})
+        if active_offers_exists:
+            active_offers = Offer.objects.filter(active=True, end_date__gt=IST_local, start_date__lte=IST_local)
+            # Fetch product offers for each active offer            
+            for offer in active_offers:
+                product_offers = ProductOffer.objects.filter(offer=offer, active=True)
+                offer_products_count += product_offers.count()
+            
+        context.update({ 'offer_products_count': offer_products_count})
+    except:
+        pass
     
     return render(request, 'index.html', context)
 
@@ -158,10 +163,13 @@ def add_to_wishlist(request, product_id):
     # Return a JSON response with the updated count
     return JsonResponse({'count': count})
 
+@login_required
 def wishlist_products(request):
     username = None
+    context = {}
     if request.user.is_authenticated:
         username = request.user.username
+        context.update({ 'username': username })
 
     user = request.user  # Assuming the user is logged in
     try:
@@ -170,24 +178,22 @@ def wishlist_products(request):
         # Retrieve all products in the user's wishlist
         products = wishlist.products.all()
 
-        images = ProductImage.objects.filter(product__in=products).order_by('product').distinct('product')
+        context.update({ 'products':products })
+
+        product_images  = ProductImage.objects.filter(product__in=products).order_by('product').distinct('product')
     except:
         message = "Wishlist is Empty!"
-        pass
+        product_images = []
 
-    paginator = Paginator(images, 6)  # Display 10 products per page    
+
+    paginator = Paginator(product_images, 10)  # Display 10 products per page    
     page_number = request.GET.get('page')
     images = paginator.get_page(page_number)
+    context.update({'images': images})
 
     # NAVBAR CAtegories Display
     categories = Category.objects.all().exclude(is_blocked = True)
-
-    context = {
-        'username': username,        
-        'images': images,
-        'products':products,
-        'categories': categories,        
-    }
+    context.update({'categories': categories})
 
     return render(request, 'wishlist.html', context)
 
@@ -458,17 +464,20 @@ def initiate_payment(request):
         order_id = order.pk  
 
         # Update Use of Coupon in 'CouponHistory'
-        coupon_applied = CouponHistory.objects.get(user=request.user, used_order_id='', return_status=False)
-        coupon_applied.used_order_id = order_id
-        coupon_applied.save()                
+        try:
+            coupon_applied = CouponHistory.objects.get(user=request.user, used_order_id='', return_status=False)
+            coupon_applied.used_order_id = order_id
+            coupon_applied.save()                
+        except ObjectDoesNotExist:
+            pass
 
         # Update 'Order' with 'id' of 'CouponHistory'
-        coupon_applied = CouponHistory.objects.get(user=request.user, used_order_id=order_id, return_status=False)
-        order.couponhistory_id = coupon_applied.pk
-        order.save()
-
-        # Increase the usage count in the Coupon model - When creating the order!
-        coupon_applied.coupon.increase_usage_count()
+        try:
+            coupon_applied = CouponHistory.objects.get(user=request.user, used_order_id=order_id, return_status=False)
+            order.couponhistory_id = coupon_applied.pk
+            order.save()
+        except ObjectDoesNotExist:
+            pass
 
         # Initialize the Razorpay client with your key and secret
         razorpay_client = razorpay.Client(auth=("rzp_test_scLGFrR0R5zejV", "ZtPHrmQQ5jK2u4ytxDFHhcNm"))
@@ -615,11 +624,13 @@ def process_filter(request):
         dict_variant_prices = ProductVariant.objects.filter(product__in=products).values('price').distinct()       
 
         list_variant_price = []
+        max_price = 0
         for price_key in dict_variant_prices:
             price = float(price_key['price'])
             list_variant_price.append(price_key['price'])
             max_price = max(list_variant_price)        
 
+        
         set_max_range = max_price % 100
         if set_max_range == 0:
             max_range = max_price
@@ -721,6 +732,7 @@ def search_products(request):
     
 
     list_variant_price = []
+    max_price = 0
     for price_key in dict_variant_prices:
         price = float(price_key['price'])
         list_variant_price.append(price_key['price'])
@@ -879,7 +891,6 @@ def add_to_cart(request, variant_id):
 
         return redirect('/cart/')  # Example: Redirect to the cart page
 
-
 # Function to get discount percentage
 def get_discount_percentage(variant_id):
     try:
@@ -912,6 +923,7 @@ def get_discount_percentage(variant_id):
     # If there is no offer or the variant_id is invalid, return None
     return None
 
+@login_required
 def cart_view(request):
     username = None
     discount = 0 # Default value for Coupon Discount
@@ -973,6 +985,7 @@ def cart_view(request):
         return render(request, 'cart.html', context)
     return redirect('/authapp/signin/')
 
+@login_required
 def update_cart_item_quantity(request):
     # print("Updating Cart...")
     # cart_items = request.POST.getlist('cartItemsQty')  # Updated line
@@ -991,6 +1004,7 @@ def update_cart_item_quantity(request):
     
     return redirect('/')  
 
+@login_required
 def remove_cart_item(request, cart_item_id):
     # Retrieve the cart item object based on the cart_item_id
     try:
@@ -1006,17 +1020,13 @@ def remove_cart_item(request, cart_item_id):
     # Redirect to the cart page after successful removal
     return redirect('/cart/')
 
+@login_required
 def checkout(request):
     user = request.user
     # Retrieve the default address for the current user
-    try:
-        user_profile = user.userprofile
-    except UserProfile.DoesNotExist:
-        # Create a new userprofile if it doesn't exist
-        user_profile = UserProfile.objects.create(user=user)
 
-    
-    # default_address = DefaultAddress.objects.select_related('address').get(user_profile=user_profile)
+    # Create a new userprofile if it doesn't exist
+    user_profile, created = UserProfile.objects.get_or_create(user=user)   
 
     username = request.user.username
     # Retrieve the cart and cart items associated with the user (assuming the user is authenticated)
@@ -1025,7 +1035,10 @@ def checkout(request):
 
     sub_total = 0
     for item in cart_items:
-        item_total = item.quantity * item.variant.price
+        if item.new_price > 0.00:
+            item_total = item.quantity * item.new_price
+        else:    
+            item_total = item.quantity * item.variant.price
         sub_total += item_total
     # print("Sub Total = ",sub_total)
 
@@ -1037,12 +1050,7 @@ def checkout(request):
         current_coupon = CouponHistory.objects.get(cart=cart, user=request.user, used_order_id='')
         coupon_obj = current_coupon.coupon  # Get respective object from 'Coupon' Model
         discount = Decimal(coupon_obj.discount)
-        # # Check if the Order has been placed with Coupon
-        # if check_use.used_order_id != '' and check_use.return_status == False:
-        #     # The coupon has been used!
-        #     discount = 0
-        
-            
+                   
     # print("Type of Sub Total : ", type(sub_total))
     # print("Type of discount : ", type(discount))
     discount_amount = (sub_total * discount) / 100
@@ -1214,40 +1222,41 @@ def order_success(request, order_id):
 ################################
 def category_page(request, category_id):
     username = None
+    context = {}
     if request.user.is_authenticated:
         username = request.user.username
+        context.update({'username': username})
     
     category = Category.objects.get(id=category_id)
     products = Product.objects.filter(category_id=category).exclude(is_blocked = True)
-    images = ProductImage.objects.filter(product__in=products).order_by('product').distinct('product')
-    # variant = ProductVariant.objects.filter(product__in=products).distinct('product')
+    product_images = ProductImage.objects.filter(product__in=products).order_by('product').distinct('product')
+    
     variant = None
-    paginator = Paginator(images, 6)  # Display 10 products per page    
+    paginator = Paginator(product_images, 10)  # Display 10 products per page    
     page_number = request.GET.get('page')
     images = paginator.get_page(page_number)
 
-    # variant_price = []
-    # for obj in variant:
-    #     variant_price.append(obj.price)
-    # print("Varinat Prices: ", variant_price)
+    context.update({
+        'category': category,
+        'images': images,
+        'products':products,
+    })
     
     # NAVBAR CAtegories Display
     categories = Category.objects.all().exclude(is_blocked = True)
+    context.update({'categories': categories})
 
     ##################
     # FILTER BY PRICE
-    ##################
-    
+    ##################    
     dict_variant_prices = ProductVariant.objects.filter(product__in=products).values('price').distinct().order_by('price')    
 
     list_variant_price = []
+    max_price = 0
     for price_key in dict_variant_prices:
         price = float(price_key['price'])
         list_variant_price.append(price_key['price'])
         max_price = max(list_variant_price)
-
-    # print("List of Price =", list_variant_price)
-    # print("MAX = ", max_price)
 
     set_max_range = max_price % 100
     if set_max_range == 0:
@@ -1293,38 +1302,32 @@ def category_page(request, category_id):
     # # List of Distinct size with their unit = ['200 ml', '150 g', '300 g', '150 ml', '100 ml', '300 ml']
 
     # Wishlist Check
+    has_products_wishlist = False
+    wishlist_count = 0
+    product_ids = []
+    try:
+        wishlist, _ = Wishlist.objects.get_or_create(user=request.user)
+        has_products_wishlist = wishlist.products.exists()
+        if has_products_wishlist:
+            context.update({'has_products_wishlist': has_products_wishlist})
+            products_wishlist = wishlist.products.all()
+            wishlist_count = wishlist.products.count()                
+            for obj in products_wishlist:
+                product_ids.append(obj.product_id)
+
+            # print("Wishlist have product!")
+            context.update({'product_ids': product_ids,})
+    except:
         has_products_wishlist = False
-        wishlist_count = 0
-        product_ids = []
-        try:
-            wishlist, _ = Wishlist.objects.get_or_create(user=request.user)
-            has_products_wishlist = wishlist.products.exists()
-            if has_products_wishlist:
-                products_wishlist = wishlist.products.all()
-                wishlist_count = wishlist.products.count()                
-                for obj in products_wishlist:
-                    product_ids.append(obj.product_id)
-
-                # print("Wishlist have product!")
-                # print(product_ids)
-        except:
-            has_products_wishlist = False
 
 
-    context = {
-        'username': username,
-        'category': category,
-        'images': images,
-        'products':products,
-        'categories': categories,
+    context.update({
         'list_of_sizes': list_variant_value_unit,
         'price_range': price_range,
-        'variant': variant,
-        'has_products_wishlist': has_products_wishlist,
-        'product_ids': product_ids,
+        'variant': variant,        
+        
         'wishlist_count': wishlist_count
-
-    }
+    })    
 
     return render(request, 'category_page.html', context)
 

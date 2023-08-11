@@ -1,5 +1,5 @@
 
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User	
 
@@ -144,6 +144,35 @@ def signin(request):
 def signout(request):
     logout(request)
     return redirect('/')
+
+
+###############
+### CONTACT US
+###############
+def contact_us(request):
+    if request.method == 'POST' and request.is_ajax():
+        subject = 'Contact Us Form Submission'
+        message = 'Message: ' + request.POST.get('message')
+        sender_email = request.POST.get('email')
+        recipient_list = ['skinscent69@gmail.com']
+
+        send_mail(subject, message, sender_email, recipient_list, fail_silently=False,)
+       
+        # # Send OTP via email
+        # send_mail(
+        #     'OTP Verification',
+        #     f'Your OTP is: {otp}',
+        #     'skinscent69@gmail.com',
+        #     [email],
+        #     fail_silently=False,
+        # )
+
+
+        response_data = {'message': 'Your message has been sent successfully.'}
+        return JsonResponse(response_data)
+
+    return render(request, 'contact.html')
+
 
 
 # Email Link Verification - Customization 

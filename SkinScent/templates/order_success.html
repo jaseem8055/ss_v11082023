@@ -7,7 +7,7 @@
     <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
         <h1 class="font-weight-semi-bold text-uppercase mb-3">Order Success</h1>
         <div class="d-inline-flex">
-            <p class="m-0"><a href="">Home</a></p>
+            <p class="m-0"><a href="/">Home</a></p>
             <p class="m-0 px-2">-</p>
             <p class="m-0">Order Success</p>
         </div>
@@ -100,36 +100,45 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <script>
-    document.getElementById('pdfButton').addEventListener('click', async function () {
-      // Create a new jsPDF instance
-      const doc = new jspdf.jsPDF();
-  
-      // Get the content container
-      const content = document.getElementById('pdfContent');
-  
-      // Use html2pdf to generate the PDF from the content
-      const pdf = await html2pdf().from(content).set({
-        margin: 15,
-        filename: 'order_success.pdf',
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      }).outputPdf();
-  
-      // Add the generated PDF content to the jsPDF instance
-      doc.addPage();
-      doc.setProperties({
-        title: 'Order Success'
-      });
-      doc.setLanguage('en-US');
-      doc.setFontSize(12);
-      doc.text(10, 10, 'Thank You! Your Order has been placed Successfully!');
-      doc.text(10, 20, 'Order Number: ' + '{{ order.order_number }}');
-      
-      doc.text(10, 40, 'Payment Method: ' + '{{ order.payment_method }}');
-  
-      // Save the PDF
-      doc.save();
+    document.addEventListener('DOMContentLoaded', function () {
+        var pdfButton = document.getElementById('pdfButton');
+        if (pdfButton) {
+            document.getElementById('pdfButton').addEventListener('click', async function () {
+                // Create a new jsPDF instance
+                const doc = new jspdf.jsPDF();
+            
+                // Get the content container
+                const content = document.getElementById('pdfContent');
+            
+                // Use html2pdf to generate the PDF from the content
+                const pdf = await html2pdf().from(content).set({
+                  margin: 15,
+                  filename: 'order_success.pdf',
+                  html2canvas: { scale: 2 },
+                  jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                }).outputPdf();
+            
+                // Add the generated PDF content to the jsPDF instance
+                doc.addPage();
+                doc.setProperties({
+                  title: 'Order Success'
+                });
+                doc.setLanguage('en-US');
+                doc.setFontSize(12);
+                doc.text(10, 10, 'Thank You! Your Order has been placed Successfully!');
+                doc.text(10, 20, 'Order Number: ' + '{{ order.order_number }}');
+                
+                doc.text(10, 40, 'Payment Method: ' + '{{ order.payment_method }}');
+            
+                // Save the PDF
+                doc.save();
+              });
+        }
     });
+    
+
+
+   
   </script>
   
 {% comment %} 

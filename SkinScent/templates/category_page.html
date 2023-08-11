@@ -1,12 +1,5 @@
 {% extends 'base3.html' %}
 
-{% comment %} {% block heart %}
-<a href="" class="btn border">
-    <i class="fas fa-heart text-primary"></i>
-    <span class="badge" id= "wishlist-count" data-product-id="{{product_id}}">0</span>
-</a>
-{% endblock heart %} {% endcomment %}
-
 {% block content %}
 
     <!---BASE 3-->
@@ -29,8 +22,7 @@
     <div class="container-fluid pt-5">
         <div class="row px-xl-5">
             <!-- Shop Sidebar Start -->
-            <div class="col-lg-3 col-md-12">
-                
+            <div class="col-lg-3 col-md-12">                
                 <!-- Price Start -->
                 <div class="border-bottom mb-4 pb-4">
                     <h5 class="font-weight-semi-bold mb-4">Filter by price</h5>
@@ -38,20 +30,18 @@
                         <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
                             <input type="checkbox" class="custom-control-input" name="price-all" id="price-all" {% if not request.GET.getlist.price %}checked{% endif %}>
                             <label class="custom-control-label" for="price-all">All Price</label>
-                            <span class="badge border font-weight-normal">1000</span>
+                            <span class="badge border font-weight-normal"></span>
                         </div>
-                        {{price_range}}
+                        
                         {% for price1 in price_range %}                        
                             {% with price2=price1|add:50  %}                            
-                            <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
-                                
+                            <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">                                
                                 <input type="checkbox" class="custom-control-input" name="price" id="price-{{ forloop.counter }}" value="{{ price1 }}-{{ price2 }}" {% if request.GET.getlist.price|join:", " == price1|stringformat:"s"|add:"-"|add:price2|stringformat:"s" %}checked{% endif %}>
                                 <label class="custom-control-label" for="price-{{ forloop.counter }}">₹{{ price1 }} - ₹{{ price2 }}</label>
-                                <span class="badge border font-weight-normal">{{ forloop.counter }}</span>
+                                <span class="badge border font-weight-normal"></span>
                             </div>                            
                             {% endwith %}
                         {% endfor %}
-
                         <button type="submit">Apply Price Filter</button>
                     </form>
                 </div>
@@ -63,9 +53,9 @@
                         <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
                             <input type="checkbox" class="custom-control-input" name="size-all" id="size-all" {% if not request.GET.getlist.size %}checked{% endif %}>
                             <label class="custom-control-label" for="size-all">All Size</label>
-                            <span class="badge border font-weight-normal">1000</span>
+                            <span class="badge border font-weight-normal"></span>
                         </div>
-                        {{list_of_sizes}}
+                        
                         {% for size in list_of_sizes %}
                         <input type="hidden" name="price-range" value="{{ price_range }}">
                         <input type="hidden" name="list-of-size" value="{{list_of_sizes}}">
@@ -74,95 +64,9 @@
                             <label class="custom-control-label" for="size-{{ forloop.counter }}">{{ size }}</label>
                         </div>                        
                         {% endfor %}
-
                         <button type="submit">Apply Size Filter</button>
                     </form>
                 </div>
-
-
-
-
-                <!-- Price Start -->
-                {% comment %} <div class="border-bottom mb-4 pb-4">
-                    <h5 class="font-weight-semi-bold mb-4">Filter by price</h5>
-                    <form>
-                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
-                            <input type="checkbox" class="custom-control-input" checked id="price-all">
-                            <label class="custom-control-label" for="price-all">All Price</label>
-                            <span class="badge border font-weight-normal">1000</span>
-                        </div>
-                        
-                        {% for price1 in price_range %}
-                            {% with price2=price1|add:50  %}
-                            <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
-                                <input type="checkbox" class="custom-control-input" id="price-{{ forloop.counter }}">
-                                <label class="custom-control-label" for="price-{{ forloop.counter }}">₹{{ price1 }} - ₹{{ price2 }}</label>
-                                <span class="badge border font-weight-normal">{{ forloop.counter }}</span>
-                            </div>                            
-                            {% endwith %}
-                        {% endfor %}                      
-                        
-                    </form>
-                </div> {% endcomment %}
-                <!-- Price End -->
-                
-                <!-- Color Start -->
-                {% comment %} <div class="border-bottom mb-4 pb-4">
-                    <h5 class="font-weight-semi-bold mb-4">Filter by color</h5>
-                    <form>
-                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
-                            <input type="checkbox" class="custom-control-input" checked id="color-all">
-                            <label class="custom-control-label" for="price-all">All Color</label>
-                            <span class="badge border font-weight-normal">1000</span>
-                        </div>
-                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
-                            <input type="checkbox" class="custom-control-input" id="color-1">
-                            <label class="custom-control-label" for="color-1">Black</label>
-                            <span class="badge border font-weight-normal">150</span>
-                        </div>
-                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
-                            <input type="checkbox" class="custom-control-input" id="color-2">
-                            <label class="custom-control-label" for="color-2">White</label>
-                            <span class="badge border font-weight-normal">295</span>
-                        </div>
-                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
-                            <input type="checkbox" class="custom-control-input" id="color-3">
-                            <label class="custom-control-label" for="color-3">Red</label>
-                            <span class="badge border font-weight-normal">246</span>
-                        </div>
-                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
-                            <input type="checkbox" class="custom-control-input" id="color-4">
-                            <label class="custom-control-label" for="color-4">Blue</label>
-                            <span class="badge border font-weight-normal">145</span>
-                        </div>
-                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between">
-                            <input type="checkbox" class="custom-control-input" id="color-5">
-                            <label class="custom-control-label" for="color-5">Green</label>
-                            <span class="badge border font-weight-normal">168</span>
-                        </div>
-                    </form>
-                </div> {% endcomment %}
-                <!-- Color End -->
-
-                <!-- Size Start -->
-                {% comment %} <div class="mb-5">
-                    <h5 class="font-weight-semi-bold mb-4">Filter by size</h5>
-                    <form>
-                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
-                            <input type="checkbox" class="custom-control-input" checked id="size-all">
-                            <label class="custom-control-label" for="size-all">All Size</label>
-                            <span class="badge border font-weight-normal">1000</span>
-                        </div>
-                        {% for size in list_of_sizes %}
-                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
-                            <input type="checkbox" class="custom-control-input" id="size-{{ forloop.counter }}">
-                            <label class="custom-control-label" for="size-{{ forloop.counter }}">{{ size }}</label>
-                            
-                        </div>                        
-                        {% endfor %}                      
-                    </form>
-                </div> {% endcomment %}
-                <!-- Size End -->
             </div>
             <!-- Shop Sidebar End -->
 
@@ -172,37 +76,15 @@
                 <div class="row pb-3">
                     <div class="col-12 pb-1">
                         <div class="d-flex align-items-center justify-content-between mb-4">
-                            {% comment %} <form action="">
-                                <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="Search by name">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text bg-transparent text-primary">
-                                            <i class="fa fa-search"></i>
-                                        </span>
-                                    </div>
-                                </div>
-                            </form> {% endcomment %}
-                            {% comment %} <div class="dropdown ml-4">
-                                <button class="btn border dropdown-toggle" type="button" id="triggerId" data-toggle="dropdown" aria-haspopup="true"
-                                        aria-expanded="false">
-                                            Sort by
-                                        </button>
-                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="triggerId">
-                                    <a class="dropdown-item" href="#">Latest</a>
-                                    <a class="dropdown-item" href="#">Popularity</a>
-                                    <a class="dropdown-item" href="#">Best Rating</a>
-                                </div>
-                            </div> {% endcomment %}
+                            
                         </div>
                     </div>
                     <!--IMAGE CARD-->
-                    {% comment %} {% for product in products %} {% endcomment %}
-                    {% comment %} {% for image in product.images.all %} {% endcomment %}
                     {% for image in images %}
                     <div class="col-lg-4 col-md-6 col-sm-12 pb-1">                        
                         <div class="card product-item border-0 mb-4">
                             <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
-                                <img class="img-fluid w-100" src="{{ image.image.url }}" alt="">
+                                <a href="/product_detail/{{ image.product.product_id }}/"><img class="img-fluid w-100" src="{{ image.image.url }}" alt=""></a>
                             </div>
                             <div class="card-body border-left border-right text-center p-0 pt-4 pb-3">
                                 <h6 class="text-truncate mb-3">{{ image.product.name }}</h6>
@@ -218,16 +100,6 @@
                                 <!-- Access the product_id here -->
                                 <a href="/product_detail/{{ image.product.product_id }}/" class="btn btn-sm text-dark p-0"><i class="fas fa-eye text-primary mr-1"></i>View Detail</a>                                
                                 
-                                
-                                {% comment %} {% if image.product.product_id in product_ids %}
-                                    <a href="/wishlist/" class="btn btn-sm text-dark p-0" ></i>View in Wishlist</a>                                
-                                {% else %}
-                                <form action="">
-                                    {% csrf_token %}
-                                    <a href="#" class="btn btn-sm text-dark p-0" onclick="addToWishlist({{ image.product.product_id }})"><i class="fas fa-heart text-primary"></i>Add To Wishlist</a>
-                                </form>
-                                {% endif %} {% endcomment %}
-
                                 {% if image.product.product_id in product_ids %}
                                     <form action="/wishlist/" method="post">
                                         {% csrf_token %}
@@ -246,8 +118,7 @@
                             </div>
                         </div>
                     </div>
-                    {% endfor %}
-                    {% comment %} {% endfor %}                     {% endcomment %}
+                    {% endfor %}                    
                     <!--IMAGE CARD-->
                     
                      <!--PAGINATOR-->
@@ -288,6 +159,12 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+    <!-- Include SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.min.css">
+
+    <!-- Include SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.all.min.js"></script>
+
     <script>
         function addToWishlist(product_id) {
             $.ajax({
@@ -307,7 +184,9 @@
                 },
                 error: function (error) {
                     // Handle the error response here (optional)
-                    console.log('Error:', error);
+                    //console.log('Error:', error);
+                    showModal("Login required!")
+
                 }
             });
         }
@@ -320,6 +199,18 @@
             //badge.text(count);
         }
         
+        // Function to show the modal
+        function showModal(msg) {                     
+                
+            Swal.fire({
+            title: "Wishlist Response:",
+            text: msg,
+            icon: "info",
+            confirmButtonText: "OK",
+            allowOutsideClick: true,
+            backdrop: true,
+            });
+        }
         </script>
         
 
