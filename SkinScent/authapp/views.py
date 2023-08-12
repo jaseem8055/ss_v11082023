@@ -150,6 +150,11 @@ def signout(request):
 ### CONTACT US
 ###############
 def contact_us(request):
+    context = {}
+    if request.user.is_authenticated:
+        username = request.user.username
+        context.update({ 'username': username }) 
+
     if request.method == 'POST' and request.is_ajax():
         subject = 'Contact Us Form Submission'
         message = 'Message: ' + request.POST.get('message')
@@ -171,7 +176,7 @@ def contact_us(request):
         response_data = {'message': 'Your message has been sent successfully.'}
         return JsonResponse(response_data)
 
-    return render(request, 'contact.html')
+    return render(request, 'contact.html', context)
 
 
 

@@ -26,6 +26,7 @@ urlpatterns = [
     # Razor Pay
     path('initiate-payment/', views.initiate_payment, name='initiate_payment'),
     path('handle-payment-success/', views.handle_payment_success, name='handle_payment_success'),    
+    path('reset-order/', views.reset_order, name='reset_order'),    
 
     # Search Options
     path('search-products/', views.search_products, name='search_products'),

@@ -134,36 +134,12 @@
                 doc.save();
               });
         }
-    });
+    }); 
+
     
-
-
-   
-  </script>
+</script>
   
-{% comment %} 
-<script>
-    document.getElementById('pdfButton').addEventListener('click', function () {
-      // Create a new jsPDF instance
-      //const doc = new jsPDF();
 
-      // Create a new jsPDF instance
-        const doc = new jspdf.jsPDF();
-    
-      // Add content to the PDF document
-      const content = document.getElementById('pdfContent'); // Replace 'pdfContent' with the ID of the container that holds your content
-      
-      // Use html2pdf to generate the PDF from the content
-        html2pdf().from(content).set({
-            margin: 15,
-            filename: 'order_success.pdf',
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        }).save();      
-      
-      
-    });
-    </script> {% endcomment %}
     
 
 {% endblock content %} 

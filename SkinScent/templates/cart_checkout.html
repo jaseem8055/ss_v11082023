@@ -10,7 +10,7 @@
             <p class="m-0"><a href="/">Home</a></p>
             <p class="m-0 px-2">-</p>
             <p class="m-0">Checkout</p>
-            <p class="m-0">- base2</p>
+            <p class="m-0"></p>
         </div>
     </div>
 </div>
@@ -169,6 +169,7 @@
     function saveOrder() {
         event.preventDefault();        
         // Get input field values
+        
         var addressee = document.getElementById('addressee').value;
         var address_line1 = document.getElementById('address_line1').value;
         var address_street = document.getElementById('address_street').value;
@@ -182,6 +183,7 @@
         var shipment_cost = document.getElementById('shipment_cost').value;
         
         // Create an object to store the data
+        
         var orderData = {
             addressee: addressee,
             address_line1: address_line1,
@@ -195,6 +197,7 @@
             discount_amount: discount_amount,
             shipment_cost: shipment_cost
         };
+        
 
         // Make an AJAX POST request to save the data
         $.ajax({
@@ -205,20 +208,22 @@
             dataType: 'json',
             success: function(response) {
                 // Handle the success response (if needed)
-                //console.log("Order data saved successfully!");
+                console.log("Order data saved successfully!");
                 // After saving, trigger the Razorpay payment flow
                 initiateRazorpayPayment(response);
             },
             error: function(xhr, status, error) {
                 // Handle the error if any
+                // Make an AJAX POST request to save the data
                 //console.log(xhr.responseText);
+                
                 try {
                     var alert_msg = JSON.parse(xhr.responseText);
                     alert(alert_msg.error);                    
                 } catch (e) {
                     alert("An error occurred. Please try again.");
                 }
-                //alert("Error saving order data. Please try again.");
+                
             }
         });
     }
@@ -268,6 +273,19 @@
 
     function handlePaymentSuccess(response) {
         //console.log("Initiated handlePaymentSuccess!");
+        // Get input field values
+        var addressee = document.getElementById('addressee').value;
+        var address_line1 = document.getElementById('address_line1').value;
+        var address_street = document.getElementById('address_street').value;
+        var city = document.getElementById('city').value;
+        var state = document.getElementById('state').value;
+        var country = document.getElementById('country').value;
+        var zip_code = document.getElementById('zip_code').value;
+        var payment_method = document.getElementById('razorpay').value;
+        var sub_total = document.getElementById('sub_total').value;
+        var discount_amount = document.getElementById('discount_amount').value;
+        var shipment_cost = document.getElementById('shipment_cost').value;              
+        
         // Extract the required data from the response
         var payment_id = response.razorpay_payment_id;
         var order_id = response.razorpay_order_id;
@@ -275,6 +293,18 @@
     
         // Prepare the data to be sent in the POST request
         var postData = {
+            addressee: addressee,
+            address_line1: address_line1,
+            address_street: address_street,
+            city: city,
+            state: state,
+            country: country,
+            zip_code: zip_code,
+            payment_method: payment_method,
+            sub_total: sub_total,
+            discount_amount: discount_amount,
+            shipment_cost: shipment_cost,
+
             razorpay_payment_id: payment_id,
             razorpay_order_id: order_id,
             razorpay_signature: signature

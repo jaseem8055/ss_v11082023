@@ -73,13 +73,22 @@ def home(request):
     
     return render(request, 'index.html', context)
 
-def contact(request):        
-    return render(request, 'contact.html')
+# def contact(request):   
+    context = {}
+    if request.user.is_authenticated:
+        username = request.user.username
+        context.update({ 'username': username })     
+    return render(request, 'contact.html', context)
 
 ########
 # OFFERS
 ########
 def offer_page(request):
+    context = {}
+    if request.user.is_authenticated:
+        username = request.user.username
+        context.update({'username': username})
+    
     # UTC to IST difference
     hours_to_add = 5
     minutes_to_add = 30
@@ -90,7 +99,7 @@ def offer_page(request):
 
     # Get all active offers
     active_offers = Offer.objects.filter(active=True, end_date__gt=IST_local, start_date__lte=IST_local)
-    context = {}
+    
     # Fetch product offers for each active offer
     offers_with_product_offers = []
     offer_products_count = 0
@@ -438,6 +447,52 @@ def initiate_payment(request):
         sub_total = request.POST.get("sub_total")
         shipment_cost = request.POST.get("shipment_cost")
 
+        discount_amount = request.POST.get("discount_amount")        
+        
+        # Initialize the Razorpay client with your key and secret
+        razorpay_client = razorpay.Client(auth=("rzp_test_scLGFrR0R5zejV", "ZtPHrmQQ5jK2u4ytxDFHhcNm"))
+        # client = razorpay.Client(auth=('rzp_test_scLGFrR0R5zejV', 'ZtPHrmQQ5jK2u4ytxDFHhcNm'))
+
+        # Create a Razorpay order with relevant details
+        razorpay_order = razorpay_client.order.create(
+            {
+                "amount": (float(sub_total) + float(shipment_cost) - float(discount_amount)) * 100,  # Amount in paise
+                # "amount": 100,  # Amount in paise
+                "currency": "INR",
+                "receipt": str(uuid.uuid4()), 
+                "payment_capture": 1  # Auto-capture the payment after successful verification
+            }
+        )
+
+        # Return the necessary information as a JSON response
+        response_data = {
+            "key": "rzp_test_scLGFrR0R5zejV",
+            "amount": razorpay_order["amount"],
+            "currency": razorpay_order["currency"],
+            "receipt": razorpay_order["receipt"],
+            "order_id": razorpay_order["id"]
+        }
+
+        return HttpResponse(json.dumps(response_data), content_type="application/json")
+    else:
+        return HttpResponse(status=405)  # Method Not Allowed
+
+def handle_payment_success(request):
+    user = request.user
+    if request.method == "POST":
+        # Fetch all fields to be stored in Order Model
+        addressee = request.POST.get("addressee")
+        address_line1 = request.POST.get("address_line1")
+        address_line2 = request.POST.get("address_street")
+        city = request.POST.get("city")
+        state = request.POST.get("state")
+        country = request.POST.get("country")
+        zip_code = request.POST.get("zip_code")
+
+        payment_method = request.POST.get("payment_method")
+        sub_total = request.POST.get("sub_total")
+        shipment_cost = request.POST.get("shipment_cost")
+
         discount_amount = request.POST.get("discount_amount")
         
         shipment_address = f'{addressee}, {address_line1}, {address_line2}, {city}, {state}, {country} {zip_code}'
@@ -479,37 +534,7 @@ def initiate_payment(request):
         except ObjectDoesNotExist:
             pass
 
-        # Initialize the Razorpay client with your key and secret
-        razorpay_client = razorpay.Client(auth=("rzp_test_scLGFrR0R5zejV", "ZtPHrmQQ5jK2u4ytxDFHhcNm"))
-        # client = razorpay.Client(auth=('rzp_test_scLGFrR0R5zejV', 'ZtPHrmQQ5jK2u4ytxDFHhcNm'))
 
-        # Create a Razorpay order with relevant details
-        razorpay_order = razorpay_client.order.create(
-            {
-                # "amount": int(sub_total) * 100,  # Amount in paise
-                "amount": 100,  # Amount in paise
-                "currency": "INR",
-                "receipt": str(uuid.uuid4()), 
-                "payment_capture": 1  # Auto-capture the payment after successful verification
-            }
-        )
-
-        # Return the necessary information as a JSON response
-        response_data = {
-            "key": "rzp_test_scLGFrR0R5zejV",
-            "amount": razorpay_order["amount"],
-            "currency": razorpay_order["currency"],
-            "receipt": razorpay_order["receipt"],
-            "order_id": razorpay_order["id"]
-        }
-
-        return HttpResponse(json.dumps(response_data), content_type="application/json")
-    else:
-        return HttpResponse(status=405)  # Method Not Allowed
-
-def handle_payment_success(request):
-    user = request.user
-    if request.method == "POST":
         # Process the payment success data here
         razorpay_payment_id = request.POST.get("razorpay_payment_id")
         razorpay_order_id = request.POST.get("razorpay_order_id")
@@ -567,6 +592,28 @@ def handle_payment_success(request):
         
         return HttpResponse(json.dumps(response_data), content_type="application/json")
 
+def reset_order(request):
+    user = request.user
+    # Fetch the last obj of 'Order' for the user
+    try:
+        order_obj = Order.objects.filter(user=user).last()
+        order_id = order_obj.pk
+        if order_obj:
+            # Revoke applied Coupon in 'CouponHistory'
+            try:
+                coupon_applied = CouponHistory.objects.get(user=request.user, used_order_id=order_id, return_status=False)
+                coupon_applied.used_order_id = ''
+                coupon_applied.save()                
+            except ObjectDoesNotExist:
+                pass
+            
+            order_obj.delete()
+
+    except ObjectDoesNotExist:
+        order_obj = None
+    
+    error_message = "Payment Not Successfull!"
+    return JsonResponse({'error': error_message}, status=400)
 
 #################
 # PROCESS FILTER
@@ -1151,17 +1198,23 @@ def create_order(request):
         order_id = order.pk  
 
         # Update Use of Coupon in 'CouponHistory'
-        coupon_applied = CouponHistory.objects.get(user=request.user, used_order_id='', return_status=False)
-        coupon_applied.used_order_id = order_id
-        coupon_applied.save()                
+        try:
+            coupon_applied = CouponHistory.objects.get(user=request.user, used_order_id='', return_status=False)
+            coupon_applied.used_order_id = order_id
+            coupon_applied.save()                
+        except ObjectDoesNotExist:
+            coupon_applied = None
 
         # Update 'Order' with 'id' of 'CouponHistory'
-        coupon_applied = CouponHistory.objects.get(user=request.user, used_order_id=order_id, return_status=False)
-        order.couponhistory_id = coupon_applied.pk
-        order.save()
+        try:
+            coupon_applied = CouponHistory.objects.get(user=request.user, used_order_id=order_id, return_status=False)
+            order.couponhistory_id = coupon_applied.pk
+            order.save()
+        except ObjectDoesNotExist:
+            coupon_applied = None
 
         # Increase the usage count in the Coupon model - When creating the order!
-        coupon_applied.coupon.increase_usage_count()
+        # coupon_applied.coupon.increase_usage_count()
        
         # Get the cart for the current user
         cart = Cart.objects.get(user=user)
